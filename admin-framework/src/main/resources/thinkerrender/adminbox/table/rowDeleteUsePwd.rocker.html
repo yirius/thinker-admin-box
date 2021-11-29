@@ -1,0 +1,30 @@
+@args(String tableId, String idKey, String deleteUrl)
+
+@* <script> *@
+(scope) => {
+    ElMessageBox.prompt('请输入密码以进行账号认证', '密码确认', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        inputType: "password",
+        inputErrorMessage: '请输入密码',
+        inputValidator(value) {
+            if(value) {
+                return value.length > 0;
+            }
+
+            return false;
+        }
+    }).then(({ value }) => {
+        deleteRequest("@deleteUrl", {
+            ids: scope.row["@idKey"],
+            password: value
+        }).then(res => {
+            ElMessage({
+                type: 'success',
+                message: '删除成功'
+            })
+        @(tableId)_getTableData(false)
+        })
+    });
+}
+@* </script> *@

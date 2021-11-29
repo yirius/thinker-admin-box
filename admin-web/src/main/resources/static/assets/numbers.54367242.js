@@ -1,0 +1,1 @@
+function o(r,t,e){return e?`${e}%`:"-"}function n(r=0,t=2){return Number.parseFloat(r).toFixed(t)}var a=Object.freeze({__proto__:null,[Symbol.toStringTag]:"Module",percentFormat:o,scaleFormat:n});export{a as n};

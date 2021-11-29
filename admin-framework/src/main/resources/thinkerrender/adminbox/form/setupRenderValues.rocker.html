@@ -1,0 +1,28 @@
+@args(String formValueName, String url, String setupRunData)
+
+@* <script> *@
+const setupRunData = () => { @raw(setupRunData) }
+if (props.layer && props.layer.rowData) {
+    @(formValueName).value = JSON.parse(JSON.stringify(props.layer.rowData))
+    setupRunData();
+} else if(props.layer && props.layer.rowIdKey) {
+    let url = "@url";
+    if(url.indexOf("?") >= 0) {
+        urlData = url.split("?")
+        url = urlData[0] + "/" + props.layer.rowIdKey + "?" + urlData[1];
+    } else {
+        url = url + "/" + props.layer.rowIdKey;
+    }
+    getRequest(url, {
+        _id: props.layer.rowIdKey
+    }).then(response => {
+        let values = @(formValueName).value;
+        for(var i in values) {
+            if(typeof response.data[i] != "undefined") {
+                values[i] = response.data[i];
+            }
+        }
+        setupRunData();
+    })
+}
+@* </script> *@

@@ -1,0 +1,30 @@
+@import java.util.*;
+
+@args(String packageName, String tableName, String className, List<Map<String, Object>> tableColumns)
+
+package @(packageName).entity;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.experimental.Accessors;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.thinker.framework.framework.database.entity.ThinkerEntity;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.util.*;
+
+@@Getter
+@@Setter
+@@Accessors(chain = true)
+@@TableName("@tableName")
+public class @className extends ThinkerEntity {
+    @for (Map<String, Object> item : tableColumns) {
+        @if(!item.get("name").equals("id") && !item.get("name").equals("createTime") && !item.get("name").equals("updateTime")) {
+    @raw(item.getOrDefault("descStr", ""))
+    private @item.get("fieldType") @item.get("name");
+        }
+    }
+}

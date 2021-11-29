@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 日志级别从低到高分为TRACE < DEBUG < INFO < WARN < ERROR < FATAL，如果设置为WARN，则低于WARN的信息都不会输出 -->
+<!-- scan:当此属性设置为true时，配置文档如果发生改变，将会被重新加载，默认值为true -->
+<!-- scanPeriod:设置监测配置文档是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。
+                 当scan为true时，此属性生效。默认的时间间隔为1分钟。 -->
+<!-- debug:当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。 -->
+<!--
+总体说明：根节点下有2个属性，三个节点
+属性： contextName 上下文名称； property 设置变量
+节点： appender,  root， logger
+-->
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <contextName>logback-spring</contextName>
+    <!-- name的值是变量的名称，value的值时变量定义的值。通过定义的值会被插入到logger上下文中。定义后，可以使“${}”来使用变量。 -->
+    <property name="log.path" value="logs" />
+    <property name="log.maxHistory" value="15" />
+    <property name="log.colorPattern" value="%magenta(%d{yyyy-MM-dd HH:mm:ss}) %highlight(%-5level) %yellow([%thread]) %green(%logger) %msg%n"/>
+    <property name="log.pattern" value="------------------------------%n%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger %msg%n"/>
+
+    <!--输出到控制台-->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!--日志文档输出格式-->
+        <encoder>
+            <!--指定日志格式-->
+            <pattern>${log.colorPattern}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- ERROR级别日志 -->
+    <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 接受的日志级别 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <!-- 保存位置及保存格式 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log.path}/error/error.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <MaxHistory>${log.maxHistory}</MaxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- 最大5MB 超过最大值，会重新建一个文件-->
+                <maxFileSize>5MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+            <charset class="java.nio.charset.Charset">UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- WARN级别日志 -->
+    <appender name="FILE_WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 接受的日志级别 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <!-- 保存位置及保存格式 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log.path}/warn/warn.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <MaxHistory>${log.maxHistory}</MaxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- 最大5MB 超过最大值，会重新建一个文件-->
+                <maxFileSize>5MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+            <charset class="java.nio.charset.Charset">UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 异步输出 -->
+    <appender name="dayLogAsyncAppender" class="ch.qos.logback.classic.AsyncAppender">
+        <includeCallerData>true</includeCallerData>
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>512</queueSize>
+        <appender-ref ref="FILE_WARN"/>
+        <appender-ref ref="FILE_ERROR"/>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE_WARN"/>
+        <appender-ref ref="FILE_ERROR"/>
+    </root>
+
+</configuration>

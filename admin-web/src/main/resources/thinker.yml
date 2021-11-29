@@ -1,0 +1,98 @@
+thinker:
+  sharding:
+    ga_verify_result: day
+  token:
+    # 是否开启aop切面，可使用@CheckLoginAspect/@CheckRoleAspect/@CheckRuleAspect
+    aop: false
+    # 是否单点登录
+    singleLogin: false
+    # 是否可以续期，若可以，则每次验证TOKEN时，会进行同等比例的时间延长
+    renewal: true
+    # token生成使用的class
+    tokenimpl: jwt
+    # 继承了LoginAbstract的登录代码
+    authTable:
+      - action: com.thinker.framework.admin.login.AdminLogin
+        secret: 198rhn1pr1u7041012n181j2
+        expire: 86400
+    # id字段
+    idKey: userId
+    # jwt对应TOKEN字段
+    tokenKey: Access-Token
+    # 多重角色区分字段
+    typeKey: Access-Type
+    # 加密的aspect需要验证
+    signAspect:
+      - com.thinker.framework.framework.abstracts.defaultimpl.SignAspectDefaultImpl
+  # 配置参数
+  config:
+    # 登录的地址
+    loginUrl: admin.html
+    # 不过滤的xss名称，否则<p>等会被过滤
+    xssNames:
+      - content
+    # 所有的资源路径，List<String>
+    resourcePaths:
+    # 跨域地址设置, string
+    allowedOrigins: "*"
+    # 上传文件地址
+    uploadPath: uploads/
+    # 上传图片可用后缀
+    uploadImageSuffix:
+      - jpg
+      - jpeg
+      - png
+      - bmp
+      - gif
+    # 上传图片大小，1024*1024*300=300M
+    uploadImageSize: 10000000
+    # 上传文件可用后缀
+    uploadFileSuffix:
+      - jpg
+      - jpeg
+      - png
+      - bmp
+      - gif
+      - flv
+      - mkv
+      - avi
+      - rmvb
+      - mpeg
+      - mov
+      - wmv
+      - mp4
+      - mp3
+      - wav
+      - rar
+      - zip
+      - 7z
+      - doc
+      - docx
+      - xls
+      - xlsx
+      - ppt
+      - pptx
+      - pdf
+      - txt
+      - skp
+    # 上传文件大小，1024*1024*300=300M
+    uploadFileSize: 10000000
+    # 默认交换机
+    rabbitExchange: thinker_box
+    # 默认队列
+    rabbitQueueDefault: thinker_box_default
+    # 订单队列
+    rabbitQueueOrder: thinker_box_order
+    # 队列失败重试次数
+    rabbitRetry: 5
+    # 队列失败后，延迟x秒进行重试
+    rabbitRetryDelay: 60
+
+  # 微信相关配置
+  wechat:
+    minapp:
+      - appid:
+        secret:
+        token:
+        aesKey:
+        msgDataFormat: JSON

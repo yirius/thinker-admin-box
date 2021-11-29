@@ -1,0 +1,17 @@
+@args(String formRef, String validThen)
+
+@* <script> *@
+() {
+    if (this.$refs["@formRef"]) {
+        this.$refs["@formRef"].validate((valid) => {
+            if (valid) {
+                @raw(validThen)
+            } else {
+                return false;
+            }
+        });
+    } else {
+        @raw(validThen)
+    }
+}
+@* </script> *@

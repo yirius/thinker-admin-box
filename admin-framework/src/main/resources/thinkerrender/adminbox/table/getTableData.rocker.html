@@ -1,0 +1,35 @@
+@args(String tableName, String api, String tableQuery, String eachData)
+
+@* <script> *@
+const @raw(tableName)_getTableData = (init) => {
+    @raw(tableName)_loading.value = true
+    if (init) {
+        @raw(tableName)_page.index = 1
+    }
+    let params = {
+        page: @raw(tableName)_page.index,
+        limit: @raw(tableName)_page.size,
+        sort: @raw(tableName)_page.sort,
+        order: @raw(tableName)_page.order ? (@raw(tableName)_page.order === "ascending" ? "asc" : "desc") : null,
+        @raw(tableQuery)
+    }
+    getRequest("@api", params).then(result => {
+        let items = result.data.items;
+        if (Array.isArray(items)) {
+            items.forEach(item => {
+                @raw(eachData)
+            });
+        }
+        @raw(tableName)_data.value = items;
+        @raw(tableName)_page.total = Number(result.data.total);
+    }).catch(error => {
+        @raw(tableName)_data.value = [];
+        @raw(tableName)_page.index = 1;
+        @raw(tableName)_page.total = 0;
+    }).finally(() => {
+        @raw(tableName)_loading.value = false;
+    })
+}
+// 触发自动更新
+@raw(tableName)_getTableData(true);
+@* </script> *@

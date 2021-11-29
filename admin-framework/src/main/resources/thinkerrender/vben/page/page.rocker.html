@@ -1,0 +1,29 @@
+@args(String tpl, String importScripts, String components, String setupScript, String returnScript, String scopedStyle, String styles)
+
+<template>
+@raw(tpl)
+</template>
+<script>
+// 进行导入模块的渲染
+@raw(importScripts)
+
+export default defineComponent({
+    components: { PageWrapper, @raw(components) },
+    setup() {
+        @raw(setupScript)
+
+        return {
+            @raw(returnScript)
+        };
+    },
+});
+</script>
+
+<!--page use css-->
+<style scoped>
+
+</style>
+<!--all css-->
+<style>
+
+</style>

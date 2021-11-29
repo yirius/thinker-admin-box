@@ -1,0 +1,45 @@
+@args(String exportFileName, String tableDataRef, String tableHeader, String exportUrl)
+
+@* <script> *@
+  let exportFileName = "@exportFileName" || this.$t(this.$route.name), header = @raw(tableHeader);
+  const exportUrl = "@exportUrl";
+  if(exportUrl) {
+    getRequest(exportUrl, {fileName: exportFileName, data: header}).then(response => {
+      aoaToSheetXlsx({
+        data: response.data.data,
+        header: response.data.header,
+        filename: response.data.filename || `${exportFileName}.xlsx`,
+      })
+    })
+  } else {
+      // 找到内部的循环obj
+    const _findMultiObj = (keyArr, dataObj) => {
+        if(keyArr.length === 1) {
+            return dataObj[keyArr[0]];
+        } else {
+            let keyName = keyArr[0];
+            keyArr.splice(0, 1);
+            return _findMultiObj(keyArr, dataObj[keyName] || {});
+        }
+    }
+    let tableData = unref(this.@(tableDataRef));
+    let data = tableData.map((item) => {
+        let resultData = {};
+        for(let itemKey in item) {
+            if(typeof header[itemKey] != "undefined") {
+                if(itemKey.indexOf(".") >= 0) {
+                    resultData[itemKey] = _findMultiObj(itemKey.split("."), item);
+                } else {
+                    resultData[itemKey] = item[itemKey];
+                }
+            }
+        }
+        return resultData;
+    })
+    jsonToSheetXlsx({
+      data: data,
+      header: header,
+      filename: `${exportFileName}.xlsx`,
+    })
+  }
+@* </script> *@

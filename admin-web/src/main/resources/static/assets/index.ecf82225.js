@@ -1,0 +1,1 @@
+const l={mounted(e,n){if(typeof n.value!="function"){console.error("callback must be a function");return}let t=null;e.__handleClick__=function(c){t&&clearInterval(t),t=setTimeout(()=>{n.value()},200)},e.addEventListener("click",e.__handleClick__)},beforeUnmount(e){e.removeEventListener("click",e.__handleClick__)}};export{l as default};

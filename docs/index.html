@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>Thinker-Admin-Box Document</title>
+  <link rel="icon" href="_assets/favicon.ico" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Document For Thinker-Admin-Box">
+  <meta name="google" content="notranslate" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.css">
+</head>
+<body>
+  <div id="app">Loading...</div>
+  <script src="//cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-edit-on-github/index.min.js"></script>
+
+  <script>
+    var mermaidNum = 0;
+    mermaid.initialize({ startOnLoad: false });
+
+    window.$docsify = {
+      // 对应名称
+      name: 'thinker-admin-box',
+      // 对应项目
+      repo: 'https://github.com/yirius/thinker-admin-box',
+      // 封面
+      coverpage: true,
+      // 首页只显示封面
+      onlyCover: true,
+      // 加载顶部导航
+      loadNavbar: true,
+      // 合并导航栏
+      mergeNavbar: true,
+      // 加载侧边栏
+      loadSidebar: true,
+      // 现实的菜单栏目
+      subMaxLevel: 4,
+      // 加载文件别名
+      alias: {
+        // '/zh-cn/_sidebar.md': '/_sidebar.md',
+        // '/zh-cn/.*/_sidebar.md': '/_sidebar.md',
+
+        '/zh-cn/_navbar.md': '/_navbar.md',
+        '/zh-cn/.*/_navbar.md': '/_navbar.md'
+      },
+      // 搜索项
+      search: {
+        noData: {
+          '/zh-cn/': '没有结果!',
+          '/': 'No results!',
+        },
+        paths: 'auto',
+        placeholder: {
+          '/zh-cn/': '搜索',
+          '/': 'Search',
+        },
+      },
+      plugins: [
+        EditOnGithubPlugin.create("https://github.com/yirius/thinker-admin-box/tree/master/docs/")
+      ],
+      markdown: {
+        renderer: {
+          code: function(code, lang) {
+            if (lang === "mermaid") {
+              return (
+                      '<div class="mermaid">' + mermaid.render('mermaid-svg-' + mermaidNum++, code) + "</div>"
+              );
+            }
+            return this.origin.code.apply(this, arguments);
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Docsify v4 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/emoji.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-java.min.js"></script>
+</body>
+</html>

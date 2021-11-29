@@ -1,0 +1,36 @@
+@args(String formRef, String url, String parseSendData)
+
+@* <script> *@
+() {
+    let formValues = unref(this["@raw(formRef)_formValue"]);
+
+    let sendData = {};
+    // 对数据进行一次计算
+    for(var valueKey in formValues) {
+        if(typeof formValues[valueKey] == "object") {
+            if(Object.prototype.toString.call(toRaw(unref(formValues[valueKey]))) === '[object Array]') {
+                sendData[valueKey] = formValues[valueKey].join(",");
+            } else {
+                sendData[valueKey] = toRaw(unref(formValues[valueKey]));
+            }
+        } else {
+            sendData[valueKey] = toRaw(unref(formValues[valueKey]));
+        }
+    }
+    if (this.layer && this.layer.rowIdKey) {
+        sendData.id = this.layer.rowIdKey;
+    }
+
+    const getSendData = () => {
+        @raw(parseSendData);
+
+        return sendData;
+    }
+
+    // 说明是新增
+    postRequest("@url", getSendData()).then(response => {
+        this.$emit('getTableData', true)
+        this.$refs["@(formRef)_layer"] && this.$refs["@(formRef)_layer"].close()
+    });
+}
+@* </script> *@

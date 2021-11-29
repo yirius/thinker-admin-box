@@ -1,0 +1,10 @@
+@args(String packageName, String className)
+
+package @(packageName).service;
+
+import @(packageName).entity.@(className);
+import com.thinker.framework.framework.database.mybatis.ThinkerIService;
+
+public interface @(className)Service extends ThinkerIService<@className> {
+
+}

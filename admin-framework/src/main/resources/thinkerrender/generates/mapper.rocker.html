@@ -1,0 +1,10 @@
+@args(String packageName, String className)
+
+package @(packageName).mapper;
+
+import @(packageName).entity.@(className);
+import com.thinker.framework.framework.database.mybatis.ThinkerMapper;
+
+public interface @(className)Mapper extends ThinkerMapper<@className> {
+
+}

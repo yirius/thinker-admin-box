@@ -1,0 +1,30 @@
+@args(String tpl, String importScripts, String components, String setupScript, String returnScript, String optionScript, String scopedStyle, String styles)
+
+<template>
+    @raw(tpl)
+</template>
+
+<script lang="ts">
+    // 进行导入模块的渲染
+    @raw(importScripts)
+
+    export default defineComponent({
+        components: { @raw(components) },
+        setup(props, ctx) {
+            @raw(setupScript)
+
+            return{
+                @raw(returnScript)
+            };
+        },
+        @raw(optionScript)
+    });
+</script>
+
+<style scoped>
+  @raw(scopedStyle)
+</style>
+
+<style>
+  @raw(styles)
+</style>

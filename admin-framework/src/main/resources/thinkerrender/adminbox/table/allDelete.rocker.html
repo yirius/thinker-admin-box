@@ -1,0 +1,17 @@
+@args(String tableId, String idKey, String deleteUrl)
+
+@* <script> *@
+() => {
+    deleteRequest("@deleteUrl", {
+        ids: @(tableId)_selectedData.value.map((e)=> {
+            return e["@idKey"]
+        }).join(',')
+    }).then(res => {
+        ElMessage({
+            type: 'success',
+            message: '删除成功'
+        })
+        @(tableId)_getTableData(false)
+    })
+}
+@* </script> *@
