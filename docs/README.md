@@ -15,7 +15,7 @@
 - 界面使用[VUE-ADMIN-BOX](https://github.com/cmdparkour/vue-admin-box)构建，并提供多套配色以供选择。
 
 ## 演示地址
-http://demo.thinkeradmin.com/admin.html
+http://demo.thinkeradmin.com/admin.html | http://tkadmin.tjxinhefu.com/admin.html
 
 演示环境账号密码:
 
