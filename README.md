@@ -1,4 +1,4 @@
-![logo](./_assets/logo.svg)
+![logo](./docs/_assets/logo.svg)
 
 > Thinker-Admin-Box 是一个基于Spring Boot 2.6.0 & Mybatis-plus 3.4.3 构建的自建TOKEN的权限管理系统。
 
@@ -7,7 +7,11 @@
 ![image](https://img.shields.io/badge/springboot-2.6.0-yellow.svg?longCache=true&style=popout-square)
 ![image](https://img.shields.io/badge/mybatisPlus-3.4.3-blue.svg?longCache=true&style=popout-square)
 
+- 部署环境: [GITHUB](https://github.com/yirius/thinker-admin-box-web) | [GITEE](https://gitee.com/yirius/thinker-admin-box-web)
+- 模块开发环境: [GITHUB](https://github.com/yirius/thinker-admin-box) | [GITEE](https://gitee.com/yirius/thinker-admin-box)
+
 - 文档请点击[DOCUMENT](https://yirius.github.io/thinker-admin-box/index.html#/)
+- 国内文档[DOCUMENT](https://www.thinkeradmin.com/index.html#/)
 - Thinker-Admin-Box是一个简单高效的后台权限管理系统。
 - JAVA框架采用 Spring Boot 2.6.0，引入大量新型机制。
 - 数据库交互采用Mybatis/Mybatis-Plus，参考THINKPHP引入了自定义DATABASE组件，可进行快捷连表字段查询。
@@ -77,7 +81,7 @@ admin | 123456 | 超级管理员
 
 ##系统截图
 
-![image](./_assets/examples/login.png)
-![image](./_assets/examples/dashboard.png)
-![image](./_assets/examples/rules.png)
-![image](./_assets/examples/monitor.png)
+![image](./docs/_assets/examples/login.png)
+![image](./docs/_assets/examples/dashboard.png)
+![image](./docs/_assets/examples/rules.png)
+![image](./docs/_assets/examples/monitor.png)
