@@ -15,6 +15,8 @@ import com.thinker.framework.framework.renders.page.ThinkerPage;
 import com.thinker.framework.framework.renders.bo.TableLayerDataCase;
 import com.thinker.framework.framework.renders.bo.TablePageCase;
 import com.thinker.framework.framework.renders.form.ThinkerForm;
+import com.thinker.framework.framework.renders.page.plugins.ThinkerCollapse;
+import com.thinker.framework.framework.renders.page.plugins.ThinkerCollapseItem;
 import com.thinker.framework.framework.renders.table.plugins.TableColumn;
 import com.thinker.framework.framework.renders.table.plugins.TableToolbar;
 import com.thinker.framework.framework.renders.tags.ComponentAttr;
@@ -432,7 +434,16 @@ public class ThinkerTable extends LayoutAbstract {
         columns.forEach(columnStr::append);
 
         // 搜索的form内容需要列在getTableData前，否则无法访问xxxx_form_formValue;
-        String searchStr = search == null ? "" : "<div style='padding: 15px 15px 0 15px'>"+search.render()+"</div>";
+        String searchStr = "";
+        if(search != null) {
+            searchStr = "<div style='padding: 15px 15px 0 15px'>"+search.render()+"</div>";
+//            String searchRender = String.valueOf(search.render());
+//            ThinkerCollapse searchCollapse = (new ThinkerCollapse()).setModelName("search_collapse").setAccordion(true);
+//            searchCollapse.getCollapseItemList().add(new ThinkerCollapseItem().setName("search").setTitle("内容搜索").setContent(searchRender));
+//            String searchCollapseStr = "<div style='padding: 15px 15px 0 15px'>"+searchCollapse.render()+"</div>";
+//            String searchNoCollapseStr = "<div style='padding: 15px 15px 0 15px'>"+searchRender+"</div>";
+//            searchStr = "<div class='hidden-xs-only'>"+searchNoCollapseStr+"</div><div class='hidden-sm-and-up'>"+searchCollapseStr+"</div>";
+        }
         String componentAttr = PageParams.strComponentAttrs(this), getTableDataAttr = getTableData();
 
         return  searchStr + (toolbar == null ? "" : toolbar.render()) +

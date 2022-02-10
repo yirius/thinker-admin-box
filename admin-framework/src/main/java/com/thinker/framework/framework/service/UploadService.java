@@ -1,5 +1,7 @@
 package com.thinker.framework.framework.service;
 
+import cn.hutool.core.img.Img;
+import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.io.FileTypeUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
@@ -11,8 +13,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -33,17 +40,17 @@ public class UploadService {
             multipartRequest = (MultipartHttpServletRequest)(request);
         }
 
-        return upload(multipartRequest, true);
+        return upload(multipartRequest, true, true);
     }
 
-    public Map<String, Object> upload(HttpServletRequest request, boolean isImage) {
+    public Map<String, Object> upload(HttpServletRequest request, boolean isImage, boolean thumbImage) {
         //判断是否上传了文件
         MultipartHttpServletRequest multipartRequest = null;
         if (request instanceof MultipartHttpServletRequest) {
             multipartRequest = (MultipartHttpServletRequest)(request);
         }
 
-        return upload(multipartRequest, isImage);
+        return upload(multipartRequest, isImage, thumbImage);
     }
 
     /**
@@ -53,7 +60,7 @@ public class UploadService {
      * @param multipartRequest
      * @return {@link Map< String, Object>}
      **/
-    public Map<String, Object> upload(MultipartHttpServletRequest multipartRequest, boolean isImage) {
+    public Map<String, Object> upload(MultipartHttpServletRequest multipartRequest, boolean isImage, boolean thumbImage) {
         //最终返回的数据
         Map<String, Object> map = new HashMap<>();
         //存在上传文件
@@ -71,6 +78,23 @@ public class UploadService {
                         try {
                             if(file.mkdirs()) {
                                 multipartFile.transferTo(file);
+
+                                if(isImage && thumbImage) {
+                                    BufferedImage image = ImageIO.read(file);
+                                    if(image.getWidth() > 1000 || image.getHeight() > 1000) {
+                                        // 如果存在过大的部分
+                                        float scale;
+                                        if(image.getWidth() > 1000) {
+                                            scale = (float) (1000 / image.getWidth());
+                                        } else {
+                                            scale = (float) (1000 / image.getHeight());
+                                        }
+                                        if(scale < 0.4f) {
+                                            scale = 0.4f;
+                                        }
+                                        ImgUtil.scale(file, file, scale);
+                                    }
+                                }
                             } else {
                                 throw new ThinkerException("message.thinker.uploads.mkdirError|{\"file\":\""+multipartFile.getOriginalFilename()+"\"}", 360);
                             }

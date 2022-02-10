@@ -1,7 +1,7 @@
 server:
   servlet:
     context-path: /
-  port: 4041
+  port: 5555
   compression:
     enabled: true
     mime-types: application/javascript,text/css,text/plain,application/xml,text/html,text/xml

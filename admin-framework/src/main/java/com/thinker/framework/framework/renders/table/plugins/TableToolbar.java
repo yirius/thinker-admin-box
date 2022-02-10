@@ -1,5 +1,6 @@
 package com.thinker.framework.framework.renders.table.plugins;
 
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.text.StrBuilder;
 import com.alibaba.fastjson.JSON;
 import com.thinker.framework.framework.abstracts.LayoutAbstract;
@@ -153,7 +154,7 @@ public class TableToolbar extends LayoutAbstract {
         thinkerTable.getColumns().forEach(tableColumn -> columns.put(tableColumn.getProp(), tableColumn.getLabel()));
 
         return thinkerrender.adminbox.table.exportXlsx.template(
-                exportFileName, thinkerTable.getLayoutId()+"_data", JSON.toJSONString(columns), exportUrl
+                exportFileName, thinkerTable.getLayoutId(), JSON.toJSONString(columns), Validator.isEmpty(exportUrl) ? "\"\"" : exportUrl
         ).render().toString();
     }
 

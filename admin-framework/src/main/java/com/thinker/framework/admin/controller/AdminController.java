@@ -206,15 +206,18 @@ public class AdminController {
     /**
      * 上传组件
      * @param request
-     * @param isimage
+     * @param isImage
      * @return
      */
     @RequestMapping(value = "/upload")
-    public ThinkerResponse upload(HttpServletRequest request, Boolean isimage) {
-        if(isimage == null) {
-            isimage = false;
+    public ThinkerResponse upload(HttpServletRequest request, Boolean isImage, Boolean isThumb) {
+        if(isImage == null) {
+            isImage = false;
         }
-        return new ThinkerResponse().data(SpringContext.getBean(UploadService.class).upload(request, isimage)).success();
+        if(isThumb == null) {
+            isThumb = false;
+        }
+        return new ThinkerResponse().data(SpringContext.getBean(UploadService.class).upload(request, isImage, isThumb)).success();
     }
 
     @CheckLoginAspect

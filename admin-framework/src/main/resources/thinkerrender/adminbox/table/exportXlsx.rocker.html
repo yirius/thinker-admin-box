@@ -1,16 +1,14 @@
-@args(String exportFileName, String tableDataRef, String tableHeader, String exportUrl)
+@args(String exportFileName, String tableRef, String tableHeader, String exportUrl)
 
 @* <script> *@
   let exportFileName = "@exportFileName" || this.$t(this.$route.name), header = @raw(tableHeader);
-  const exportUrl = "@exportUrl";
-  if(exportUrl) {
-    getRequest(exportUrl, {fileName: exportFileName, data: header}).then(response => {
-      aoaToSheetXlsx({
-        data: response.data.data,
-        header: response.data.header,
-        filename: response.data.filename || `${exportFileName}.xlsx`,
-      })
-    })
+  let useExportUrl = @raw(exportUrl);
+  if(useExportUrl) {
+      let tablePage = toRaw(unref(this.@(tableRef)_page));
+      for(var i in tablePage) {
+          useExportUrl = useExportUrl.replace("{"+i+"}", tablePage[i]);
+      }
+      window.open(useExportUrl);
   } else {
       // 找到内部的循环obj
     const _findMultiObj = (keyArr, dataObj) => {
@@ -22,7 +20,7 @@
             return _findMultiObj(keyArr, dataObj[keyName] || {});
         }
     }
-    let tableData = unref(this.@(tableDataRef));
+    let tableData = unref(this.@(tableRef)_data);
     let data = tableData.map((item) => {
         let resultData = {};
         for(let itemKey in item) {

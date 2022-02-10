@@ -1,9 +1,12 @@
 package com.thinker.framework.framework.renders.table.plugins;
 
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.text.StrBuilder;
+import com.alibaba.fastjson.JSON;
 import com.thinker.framework.framework.abstracts.LayoutAbstract;
 import com.thinker.framework.framework.entity.vo.TextValue;
 import com.thinker.framework.framework.renders.PageParams;
+import com.thinker.framework.framework.renders.ThinkerHtml;
 import com.thinker.framework.framework.renders.enums.ButtonType;
 import com.thinker.framework.framework.renders.form.assemblys.Button;
 import com.thinker.framework.framework.renders.table.ThinkerTable;
@@ -202,6 +205,43 @@ public class TableColumn extends LayoutAbstract {
             return slotStr("header", "scope", strBuilder.toStringAndReset());
         }
         return "";
+    }
+
+    /**
+     * 设置图片展示逻辑
+     */
+    private ThinkerHtml imgHtml = null;
+    public TableColumn imgColumn(String imgName) {
+        if(imgHtml == null) {
+            // 展示逻辑
+            PageParams.createRef(
+                    getLayoutId() + "_" + getProp() + "_imageViewer",
+                    JSON.toJSONString(Dict.create().set("urlList", new ArrayList<>()).set("show", false))
+            );
+            // 图片的点击逻辑
+            PageParams.setMethods(getLayoutId()+"_"+getProp()+"_imageViewer_Preview", "(thumbs){" +
+                    "   if(thumbs){" +
+                    "       this." + getLayoutId() + "_" + getProp() + "_imageViewer.urlList = typeof thumbs=='string'?thumbs.split(','):thumbs;" +
+                    "       this." + getLayoutId() + "_" + getProp() + "_imageViewer.show = true;" +
+                    "   }" +
+                    "}");
+            // 关闭逻辑
+            PageParams.setMethods(getLayoutId()+"_"+getProp()+"_imageViewer_onClose", "(){" +
+                    "   this." + getLayoutId() + "_" + getProp() + "_imageViewer.show = false;" +
+                    "}");
+
+            imgHtml = new ThinkerHtml().setHtml("<el-image-viewer v-if=\""+getLayoutId() + "_" + getProp() + "_imageViewer.show\" " +
+                    " :onClose=\""+getLayoutId() + "_" + getProp()+"_imageViewer_onClose\" " +
+                    " :url-list=\""+getLayoutId() + "_" + getProp() + "_imageViewer.urlList\" />");
+
+            PageParams.setTplLayout(imgHtml);
+
+            defaultTemplate.add(
+                    new ThinkerHtml()
+                            .setHtml("<img @click='"+getLayoutId()+"_"+getProp()+"_imageViewer_Preview(scope.row."+imgName+")' :src='item' v-for='(item, index) in (scope.row."+imgName+"?scope.row."+imgName+".split(\",\"):[])' style='width: 50px;height: 50px'>")
+            );
+        }
+        return this;
     }
 
     /**

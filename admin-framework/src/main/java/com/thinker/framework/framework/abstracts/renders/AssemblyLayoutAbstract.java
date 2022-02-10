@@ -98,6 +98,11 @@ public abstract class AssemblyLayoutAbstract extends LayoutAbstract {
         return addAssembly(new Input(prop, label));
     }
 
+    // 聚合一行
+    public InputRange inputRange(String prop, String label) {
+        return addAssembly(new InputRange(prop, label));
+    }
+
     public InputAutocomplete inputAutocomplete(String prop, String label) {
         return addAssembly(new InputAutocomplete(prop, label));
     }
