@@ -10,6 +10,7 @@ import com.thinker.framework.framework.ThinkerAdmin;
 import com.thinker.framework.framework.entity.vo.LabelValue;
 import com.thinker.framework.framework.renders.PageParams;
 import com.thinker.framework.framework.renders.bo.CheckboxItems;
+import com.thinker.framework.framework.renders.bo.TinymceTemplate;
 import com.thinker.framework.framework.renders.form.assemblys.Date;
 import com.thinker.framework.framework.renders.form.assemblys.Input;
 import com.thinker.framework.framework.renders.form.assemblys.Upload;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,7 +41,7 @@ public class SystemController extends ThinkerController {
             thinkerTable.column("name", "语言名称").openSortable();
             thinkerTable.column("op", "操作").edit().delete().setWidth("180px");
 
-            thinkerTable.toolbar().add().delete().defaultTools();
+            thinkerTable.toolbar().add().delete().xlsx().defaultTools();
 
             thinkerTable.setDefaultExpandAll(true).setPageSizes(Arrays.asList(100,500,1000)).getPage().setSize(500);
 
@@ -132,33 +134,16 @@ public class SystemController extends ThinkerController {
             thinkerForm.input("title", "组别名称");
             thinkerForm.input("name", "英文代号");
 
-            thinkerForm.tree("ruleIds", "可用规则").setData(parseLabelValue(
-                    TreeUtil.build(
-                            SpringContext.getBean(TkRulesImpl.class)
-                                    .query().orderByAsc("parent_id").list()
-                                    .stream()
-                                    .map(tkRules -> new TreeNode<>(tkRules.getId(), tkRules.getParentId(), tkRules.getTitle(), tkRules.getWeight()))
-                                    .collect(Collectors.toList()),
-                            0L
-                    )));
+            thinkerForm.tree("ruleIds", "可用规则");
+            PageParams.setSetupSuffixScript(
+                    "getRequest('/restful/thinker/system/roles/getRuleIds', {}).then(response => {" +
+                            "   "+thinkerForm.getLayoutId()+"_ruleIds_data.value = response.data;" +
+                            "});"
+            );
+
             thinkerForm.switchs("status", "角色状态");
 
         }).setSubmitUrl("/restful/thinker/system/roles").page().toString();
-    }
-
-    /**
-     * 计算所有的规则
-     * @param treeNodes
-     * @return
-     */
-    private List<LabelValue> parseLabelValue(List<Tree<Long>> treeNodes) {
-        return treeNodes.stream().map(nodeItem -> {
-            if(nodeItem.getChildren() != null && nodeItem.getChildren().size() > 0) {
-                return LabelValue.create(nodeItem.getName().toString(), nodeItem.getId()).set("children", parseLabelValue(nodeItem.getChildren()));
-            }
-
-            return LabelValue.create(nodeItem.getName().toString(), nodeItem.getId());
-        }).collect(Collectors.toList());
     }
 
     /**

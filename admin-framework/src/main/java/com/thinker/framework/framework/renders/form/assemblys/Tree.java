@@ -58,11 +58,11 @@ public class Tree extends AssemblyAbstract {
         // 设置计算属性，否则参数永远都是全选
         PageParams.setComputed(getLayoutId()+"_"+getProp()+"_defaultCheckedKeys", "() {" +
                 "   var refTree = this.$refs." + getLayoutId()+"_"+getProp()+";" +
-                "   if(refTree) {" +
+                "   if(refTree&&this."+getLayoutId()+"_"+getProp()+"_data.length>0) {" +
                 "       const nodeIds = toRaw(unref(this." + getLayoutId()+"_formValue."+getProp() + "));" +
                 "       let treeSelectedKeys = [];" +
                 "       for(var i in nodeIds) {" +
-                "           if(refTree.getNode(nodeIds[i]).childNodes.length == 0) {" +
+                "           if(refTree.getNode(nodeIds[i])&&refTree.getNode(nodeIds[i]).childNodes.length == 0) {" +
                 "               treeSelectedKeys.push(nodeIds[i]);" +
                 "           }" +
                 "       }" +

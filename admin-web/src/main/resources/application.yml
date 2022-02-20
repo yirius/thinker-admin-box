@@ -1,7 +1,7 @@
 server:
   servlet:
     context-path: /
-  port: 5555
+  port: 5560
   compression:
     enabled: true
     mime-types: application/javascript,text/css,text/plain,application/xml,text/html,text/xml
@@ -20,6 +20,11 @@ spring:
     multipart:
       max-file-size: 300MB
       max-request-size: 300MB
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+      exclude: WEB-INF/**
   #设置抛出报错
   mvc:
     throw-exception-if-no-handler-found: true
@@ -50,3 +55,19 @@ mybatis-plus:
   global-config:
     # 关闭 mybatis-plus的 banner
     banner: false
+
+# 监控相关类
+management:
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    export:
+      prometheus:
+        descriptions: true

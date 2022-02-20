@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.text.StrBuilder;
 import com.alibaba.fastjson.JSON;
 import com.thinker.framework.framework.abstracts.LayoutAbstract;
+import com.thinker.framework.framework.entity.vo.LabelProp;
 import com.thinker.framework.framework.renders.PageParams;
 import com.thinker.framework.framework.renders.enums.ButtonType;
 import com.thinker.framework.framework.renders.form.assemblys.Button;
@@ -12,11 +13,14 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -73,6 +77,27 @@ public class TableToolbar extends LayoutAbstract {
         deleteBtn.openPopConfirm().setTitle("是否确定批量删除数据?")
                 .confirmAllDeleteUsePassword(thinkerTable.getLayoutId(), "id", thinkerTable.getApi());
         if(closure != null) closure.run(deleteBtn);
+        return this;
+    }
+
+    /**
+     * excel导入
+     * @return
+     */
+    public TableToolbar xlsx() {
+        return xlsx(null);
+    }
+
+    public TableToolbar xlsx(Button.Closure closure) {
+        Button xlsxBtn = this.button(getLayoutId() + "_toolbar_xlsx", "导入EXCEL")
+                .setIcon("UploadFilled").setType(ButtonType.SUCCESS).xlsx(null);
+        getThinkerTable().getColumns().forEach(tableColumn -> {
+            if(!tableColumn.getProp().equals("op")&&!tableColumn.getLabel().equals("操作")) {
+                xlsxBtn.getLayerXlsx().getColumns().add(LabelProp.create(tableColumn.getLabel(), tableColumn.getProp()));
+            }
+        });
+        xlsxBtn.getLayerXlsx().setPostUrl(getThinkerTable().getApi() + "/ImportExcel").setUploadUrl(getThinkerTable().getApi() + "/UploadExcel");
+        if(closure != null) closure.run(xlsxBtn);
         return this;
     }
 

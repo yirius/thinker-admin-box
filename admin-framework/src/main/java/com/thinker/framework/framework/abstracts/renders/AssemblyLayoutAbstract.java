@@ -154,4 +154,8 @@ public abstract class AssemblyLayoutAbstract extends LayoutAbstract {
     public Upload upload(String prop, String label) {
         return addAssembly(new Upload(prop, label));
     }
+
+    public Tinymce tinymce(String prop, String label) {
+        return addAssembly(new Tinymce(prop, label));
+    }
 }

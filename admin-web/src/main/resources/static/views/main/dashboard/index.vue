@@ -1,5 +1,6 @@
 <template>
   <div class="box">
+    <basic-template />
     <Card />
     <Charts />
   </div>

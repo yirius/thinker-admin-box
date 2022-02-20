@@ -2,6 +2,7 @@ package com.thinker.framework.framework.renders;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.ReflectUtil;
 import com.alibaba.fastjson.JSON;
@@ -306,30 +307,32 @@ public class PageParams {
                 Object fieldValue = BeanUtil.getFieldValue(obj, s);
                 if(fieldValue != null) {
                     ComponentAttr componentAttr = (ComponentAttr) annotation;
-                    String fieldName = obj.getLayoutId() + "_" + s;
-                    if(obj.getClass().getSuperclass().getName().contains("AssemblyAbstract")) {
-                        fieldName = obj.getLayoutId() + "_" + ((AssemblyAbstract) obj).getProp() + "_" + s;
-                    }
-                    strBuilder.append(componentAttr.prevStr()).append(s).append("=\"");
-                    if(componentAttr.isRef()) {
-                        createRef(fieldName, JSON.toJSONString(fieldValue));
-                        strBuilder.append(fieldName);
-                    } else if(componentAttr.isReactive()) {
-                        createReactive(fieldName, JSON.toJSONString(fieldValue));
-                        strBuilder.append(fieldName);
-                    } else if(componentAttr.isEvent()) {
-                        setMethods(fieldName, "("+componentAttr.eventArgs()+") {"+fieldValue+"}");
-                        strBuilder.append(fieldName).append(componentAttr.eventStateArgs());
-                    } else {
-                        if(fieldValue.getClass().getSimpleName().equals("String")) {
-                            strBuilder.append(fieldValue);
-                        } else if(fieldValue.getClass().getSuperclass().getName().equals("java.lang.Enum")) {
-                            strBuilder.append(fieldValue.toString());
-                        } else {
-                            strBuilder.append(JSON.toJSONString(fieldValue));
+                    if(!(s.equalsIgnoreCase("size")&&Validator.isEmpty(fieldValue.toString()))) {
+                        String fieldName = obj.getLayoutId() + "_" + s;
+                        if(obj.getClass().getSuperclass().getName().contains("AssemblyAbstract")) {
+                            fieldName = obj.getLayoutId() + "_" + ((AssemblyAbstract) obj).getProp() + "_" + s;
                         }
+                        strBuilder.append(componentAttr.prevStr()).append(s).append("=\"");
+                        if(componentAttr.isRef()) {
+                            createRef(fieldName, JSON.toJSONString(fieldValue));
+                            strBuilder.append(fieldName);
+                        } else if(componentAttr.isReactive()) {
+                            createReactive(fieldName, JSON.toJSONString(fieldValue));
+                            strBuilder.append(fieldName);
+                        } else if(componentAttr.isEvent()) {
+                            setMethods(fieldName, "("+componentAttr.eventArgs()+") {"+fieldValue+"}");
+                            strBuilder.append(fieldName).append(componentAttr.eventStateArgs());
+                        } else {
+                            if(fieldValue.getClass().getSimpleName().equals("String")) {
+                                strBuilder.append(fieldValue);
+                            } else if(fieldValue.getClass().getSuperclass().getName().equals("java.lang.Enum")) {
+                                strBuilder.append(fieldValue.toString());
+                            } else {
+                                strBuilder.append(JSON.toJSONString(fieldValue));
+                            }
+                        }
+                        strBuilder.append("\" ");
                     }
-                    strBuilder.append("\" ");
                 }
             }
         });

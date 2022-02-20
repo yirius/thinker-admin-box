@@ -9,10 +9,13 @@ import com.thinker.framework.admin.login.AdminLogin;
 import com.thinker.framework.admin.mapper.TkMemberMapper;
 import com.thinker.framework.admin.serviceimpl.TkMemberImpl;
 import com.thinker.framework.framework.ThinkerAdmin;
+import com.thinker.framework.framework.aspect.logs.ThinkerTableLogAspect;
 import com.thinker.framework.framework.support.exceptions.ThinkerException;
 import com.thinker.framework.framework.utils.ToolsUtil;
+import com.thinker.framework.framework.widgets.ThinkerResponse;
 import com.thinker.framework.token.extend.ThinkerRestful;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,6 +32,25 @@ public class TkMembersRestful extends ThinkerRestful<TkMemberMapper, TkMember> {
 
     public TkMembersRestful() {
         setUseTable(TkMemberImpl.class);
+    }
+
+    /**
+     * 保存
+     *
+     * @param entity
+     * @param bindingResult
+     * @return
+     */
+    @Override
+    @ThinkerTableLogAspect
+    public ThinkerResponse save(TkMember entity, BindingResult bindingResult) {
+        return super.save(entity, bindingResult);
+    }
+
+    @Override
+    @ThinkerTableLogAspect
+    public ThinkerResponse delete(String ids, String password) {
+        return super.delete(ids, password);
     }
 
     @Override

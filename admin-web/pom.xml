@@ -23,11 +23,11 @@
             <groupId>com.thinker</groupId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <artifactId>admin-queue</artifactId>
-            <groupId>com.thinker</groupId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <artifactId>admin-queue</artifactId>-->
+<!--            <groupId>com.thinker</groupId>-->
+<!--            <version>0.0.1-SNAPSHOT</version>-->
+<!--        </dependency>-->
     </dependencies>
 
     <build>

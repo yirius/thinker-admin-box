@@ -43,3 +43,4 @@ build/
 
 ### admin-box templates ###
 /vue-admin-box/
+/vue-admin-box-base/

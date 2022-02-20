@@ -165,6 +165,12 @@ public class Upload extends AssemblyAbstract {
                 "   }" +
                 "});" + this.onChange;
 
+        // 触发删除
+        this.onRemove = "let url = file.response?file.response.data."+(Validator.isNotEmpty(name)?name:"file") + ":file.url;" +
+                "this." + getLayoutId() + "_formValue." + getProp() + ".splice(" +
+                "   this." + getLayoutId() + "_formValue." + getProp() + ".indexOf(url), 1" +
+                ");"+ this.onRemove;
+
         // 设置数据读取后的渲染
         PageParams.setParseSetupData("let _"+getLayoutId()+"_"+getProp()+"_uploadData = " + getLayoutId() + "_formValue.value."+getProp()+";" +
                 "if(typeof _"+getLayoutId()+"_"+getProp()+"_uploadData != 'undefined' && _"+getLayoutId()+"_"+getProp()+"_uploadData != null) {" +

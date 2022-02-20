@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.1</version>
+        <version>2.6.3</version>
         <relativePath/>
     </parent>
 
@@ -29,11 +29,12 @@
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
         <jredis>3.7.0</jredis>
-        <mybatis.plus>3.4.3.4</mybatis.plus>
-        <mybatis.dynamic>3.4.1</mybatis.dynamic>
+        <mybatis.plus>3.5.1</mybatis.plus>
+        <mybatis.dynamic>3.5.1</mybatis.dynamic>
         <mybatis.p6spy>3.8.1</mybatis.p6spy>
-        <fastjson>1.2.78</fastjson>
+        <fastjson>1.2.73</fastjson>
         <hutool.all>5.6.3</hutool.all>
     </properties>
 
@@ -43,32 +44,35 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <!-- AOP切面注入 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
+        <!-- 开发热重载 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+        <!-- 配置缓存，Redis等 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
+        <!-- XML等配置加载 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
-        <!--校验参数，@NotNull等-->
+        <!-- 校验参数，@NotNull等 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
-
-        <!--构造器-->
+        <!-- 应用监控管理 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-actuator</artifactId>
@@ -77,7 +81,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+        </dependency>
         <!--Redis参数-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -89,6 +100,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- 排除lettuce，使用jedis -->
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>

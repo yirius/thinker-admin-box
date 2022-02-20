@@ -9,11 +9,13 @@ import com.thinker.framework.admin.entity.TkRules;
 import com.thinker.framework.admin.mapper.TkRulesMapper;
 import com.thinker.framework.admin.serviceimpl.TkRulesImpl;
 import com.thinker.framework.framework.ThinkerAdmin;
+import com.thinker.framework.framework.aspect.logs.ThinkerTableLogAspect;
 import com.thinker.framework.framework.support.SpringContext;
 import com.thinker.framework.framework.support.exceptions.ThinkerException;
 import com.thinker.framework.framework.widgets.ThinkerResponse;
 import com.thinker.framework.token.extend.ThinkerRestful;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,6 +44,25 @@ public class TkRulesRestful extends ThinkerRestful<TkRulesMapper, TkRules> {
         return new ThinkerResponse().data(
                 Dict.create().set("items", TreeUtil.build(nodeList, 0L)).set("total", nodeList.size())
         ).success();
+    }
+
+    /**
+     * 保存
+     *
+     * @param entity
+     * @param bindingResult
+     * @return
+     */
+    @Override
+    @ThinkerTableLogAspect
+    public ThinkerResponse save(TkRules entity, BindingResult bindingResult) {
+        return super.save(entity, bindingResult);
+    }
+
+    @Override
+    @ThinkerTableLogAspect
+    public ThinkerResponse delete(String ids, String password) {
+        return super.delete(ids, password);
     }
 
     @Override
