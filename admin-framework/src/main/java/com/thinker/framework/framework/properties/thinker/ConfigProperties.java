@@ -12,6 +12,7 @@ public class ConfigProperties {
     private String allowedOrigins;
     private String uploadPath;
     private List<String> uploadImageSuffix;
+    private long thumbImageSize;
     private long uploadImageSize;
     private List<String> uploadFileSuffix;
     private long uploadFileSize;

@@ -169,6 +169,10 @@ public class ThinkerForm extends AssemblyLayoutAbstract {
      * 数据展示成功后，进行其他操作
      */
     private String parseSetupData = "";
+    /**
+     * getRead之前处理参数
+     */
+    private String getDataParse = "";
 
     /**
      * 各组件需要继承的接口
@@ -192,7 +196,7 @@ public class ThinkerForm extends AssemblyLayoutAbstract {
         // 需要等渲染完了，才能设置script
         if(Validator.isNotEmpty(submitUrl)) {
             PageParams.setSetupScript(thinkerrender.adminbox.form.setupRenderValues.template(
-                    formValueName, Validator.isNotEmpty(readUrl) ? readUrl : submitUrl, parseSetupData + StrUtil.join("\n", PageParams.getParseSetupData())
+                    formValueName, Validator.isNotEmpty(readUrl) ? readUrl : submitUrl, parseSetupData + StrUtil.join("\n", PageParams.getParseSetupData()), getDataParse
             ).render().toString());
 
             PageParams.setImport("@/api/request", "getRequest", "postRequest", "putRequest");

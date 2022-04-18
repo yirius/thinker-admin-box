@@ -79,7 +79,8 @@ public class UploadService {
                             if(file.mkdirs()) {
                                 multipartFile.transferTo(file);
 
-                                if(isImage && thumbImage) {
+                                // 如果超出大小，再去进行压缩
+                                if(isImage && thumbImage && multipartFile.getSize() > ThinkerAdmin.properties().getConfig().getThumbImageSize()) {
                                     BufferedImage image = ImageIO.read(file);
                                     if(image.getWidth() > 1000 || image.getHeight() > 1000) {
                                         // 如果存在过大的部分

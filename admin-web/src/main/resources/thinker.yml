@@ -44,6 +44,8 @@ thinker:
       - png
       - bmp
       - gif
+    # 上传图片压缩大小
+    thumbImageSize: 50000
     # 上传图片大小，1024*1024*300=300M
     uploadImageSize: 10000000
     # 上传文件可用后缀

@@ -1,7 +1,8 @@
-@args(String formValueName, String url, String setupRunData)
+@args(String formValueName, String url, String setupRunData, String getDataParse)
 
 @* <script> *@
 const setupRunData = () => { @raw(setupRunData) }
+const getDataParse = (sendData) => { @raw(getDataParse) }
 if (props.layer && props.layer.rowData) {
     @(formValueName).value = JSON.parse(JSON.stringify(props.layer.rowData))
     setupRunData();
@@ -13,9 +14,11 @@ if (props.layer && props.layer.rowData) {
     } else {
         url = url + "/" + props.layer.rowIdKey;
     }
-    getRequest(url, {
+    let sendData = {
         _id: props.layer.rowIdKey
-    }).then(response => {
+    };
+    getDataParse(sendData);
+    getRequest(url, sendData).then(response => {
         let values = @(formValueName).value;
         for(var i in values) {
             if(typeof response.data[i] != "undefined") {
