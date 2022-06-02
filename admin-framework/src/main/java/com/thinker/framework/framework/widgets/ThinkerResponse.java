@@ -22,6 +22,16 @@ public class ThinkerResponse extends HashMap<String, Object> {
         return this;
     }
 
+    /**
+     * 填充对应参数，前端可以读取对应的i18n
+     * @param local
+     * @return
+     */
+    public ThinkerResponse local(String local) {
+        this.put("_local", local);
+        return this;
+    }
+
     public ThinkerResponse data(Object data) {
         this.put("data", data);
         return this;

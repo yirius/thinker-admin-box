@@ -59,27 +59,29 @@ public class CacheUtil {
         List<Tree<Long>> treeList = (List<Tree<Long>>) ThinkerAdmin.redis().hashGet("ADMIN_ALL_USER_MENUS", userId+"_"+accessType);
 
         if(treeList == null) {
-            // 找到所有的ID
-            List<TreeNode<Long>> nodeList = SpringContext.getBean(TkRulesImpl.class)
-                    .query().orderByAsc("parent_id,weight").in(
-                            "id", ThreadTokenUtil.getUserRuleIds(userId, accessType)
-                    ).eq("is_router", 1).list().stream().map(tkRules -> {
-                        tkRules.setTitle("message.menu." + tkRules.getName());
+            List<String> userRuleIds = ThreadTokenUtil.getUserRuleIds(userId, accessType);
+            if(userRuleIds.size() > 0) {
+                // 找到所有的ID
+                List<TreeNode<Long>> nodeList = SpringContext.getBean(TkRulesImpl.class)
+                        .query().orderByAsc("parent_id,weight").in("id", userRuleIds)
+                        .eq("is_router", 1).list().stream().map(tkRules -> {
+                            tkRules.setTitle("message.menu." + tkRules.getName());
 
-                        Dict dict = Dict.create()
-                                .set("meta", JSON.parseObject(JSON.toJSONString(tkRules), MetaData.class))
-                                .set("name", "message.menu." + tkRules.getName())
-                                .set("path", tkRules.getPath())
-                                .set("component", tkRules.getComponent())
-                                .set("redirect", tkRules.getRedirect());
+                            Dict dict = Dict.create()
+                                    .set("meta", JSON.parseObject(JSON.toJSONString(tkRules), MetaData.class))
+                                    .set("name", "message.menu." + tkRules.getName())
+                                    .set("path", tkRules.getPath())
+                                    .set("component", tkRules.getComponent())
+                                    .set("redirect", tkRules.getRedirect());
 
-                        return new TreeNode<>(tkRules.getId(), tkRules.getParentId(), tkRules.getName(), tkRules.getWeight())
-                                .setExtra(dict);
-                    }).collect(Collectors.toList());
+                            return new TreeNode<>(tkRules.getId(), tkRules.getParentId(), tkRules.getName(), tkRules.getWeight())
+                                    .setExtra(dict);
+                        }).collect(Collectors.toList());
 
-            treeList = TreeUtil.build(nodeList, 0L);
+                treeList = TreeUtil.build(nodeList, 0L);
 
-            ThinkerAdmin.redis().hashSet("ADMIN_ALL_USER_MENUS", userId+"_"+accessType, treeList);
+                ThinkerAdmin.redis().hashSet("ADMIN_ALL_USER_MENUS", userId+"_"+accessType, treeList);
+            }
         }
 
         return treeList;

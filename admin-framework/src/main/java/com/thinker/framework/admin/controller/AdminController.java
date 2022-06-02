@@ -114,12 +114,12 @@ public class AdminController {
         // 如果密码错误次数过多，则显示验证码
         int loginErr = (int) ThinkerAdmin.redis().get("LOGIN_"+username+"_ERR", 0);
         if(loginErr == 1 && Validator.isEmpty(vercode)) {
-            return new ThinkerResponse().msg("message.thinker.token.emptyVercode").fail().code(505);
+            return new ThinkerResponse().local("message.thinker.token.emptyVercode").msg("验证码不能为空").fail().code(505);
         }
 
         // 如果提交了验证码，就验证
         if(Validator.isNotEmpty(vercode) && !lineCaptcha.verify(vercode)) {
-            return new ThinkerResponse().msg("message.thinker.token.vercodeIncorrect").fail().code(506);
+            return new ThinkerResponse().local("message.thinker.token.vercodeIncorrect").msg("验证码输入不正确").fail().code(506);
         }
 
         try {

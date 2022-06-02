@@ -1,27 +1,33 @@
 package com.thinker.framework.admin.controller;
 
-import cn.hutool.core.lang.Dict;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
+import com.baomidou.dynamic.datasource.provider.DynamicDataSourceProvider;
+import com.baomidou.dynamic.datasource.provider.YmlDynamicDataSourceProvider;
+import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceAutoConfiguration;
 import com.thinker.framework.framework.ThinkerAdmin;
-import com.thinker.framework.framework.renders.PageParams;
-import com.thinker.framework.framework.renders.enums.ButtonType;
+import com.thinker.framework.framework.entity.vo.LabelValue;
 import com.thinker.framework.framework.support.SpringContext;
+import com.thinker.framework.framework.widgets.ThinkerResponse;
 import com.thinker.framework.token.extend.ThinkerController;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
+import javax.sql.DataSource;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/thinker/monitor")
 public class MonitorController extends ThinkerController {
 
-    @RequestMapping(value = "/loginLogs.vue")
-    public String loginLogs() {
+    @RequestMapping(value = "/loginLogs")
+    public ThinkerResponse loginLogs() {
         return ThinkerAdmin.table(thinkerTable -> {
             thinkerTable.setApi("/restful/thinker/monitor/systemLogs?is_null_user=1");
 
@@ -29,28 +35,27 @@ public class MonitorController extends ThinkerController {
                 thinkerForm.input("content", "内容搜索");
             });
 
-            thinkerTable.column("content", "显示内容");
-            thinkerTable.column("createTime", "记录时间").setWidth("140px");
+            thinkerTable.column("stages", "运行方法");
+            thinkerTable.column("typeName", "归属类型");
+            thinkerTable.column("content", "提交内容");
+            thinkerTable.column("message", "输出数据");
+            thinkerTable.column("createTime", "记录时间").setWidth("160px");
 
-            thinkerTable.toolbar().defaultTools();
-
-        }).page().toString();
+        }).page();
     }
 
-    @RequestMapping(value = "/httpLogs.vue")
-    public String httpLogs() {
+    @RequestMapping(value = "/httpLogs")
+    public ThinkerResponse httpLogs() {
         return ThinkerAdmin.table(thinkerTable -> {
             thinkerTable.setApi("/restful/thinker/monitor/systemLogs/redisLogs");
 
             thinkerTable.column("content", "显示内容");
 
-            thinkerTable.toolbar().defaultTools();
-
-        }).page().toString();
+        }).page();
     }
 
-    @RequestMapping(value = "/sysLogs.vue")
-    public String sysLogs() {
+    @RequestMapping(value = "/sysLogs")
+    public ThinkerResponse sysLogs() {
         return ThinkerAdmin.table(thinkerTable -> {
             thinkerTable.setApi("/restful/thinker/monitor/systemLogs?is_user=1");
 
@@ -60,72 +65,83 @@ public class MonitorController extends ThinkerController {
 
             thinkerTable.column("userId", "用户ID").setWidth("100px");
             thinkerTable.column("userType", "用户类型").setWidth("80px");
-            thinkerTable.column("content", "显示内容");
-            thinkerTable.column("createTime", "记录时间").setWidth("140px");
+            thinkerTable.column("stages", "运行方法");
+            thinkerTable.column("typeName", "归属类型");
+            thinkerTable.column("content", "提交内容");
+            thinkerTable.column("message", "输出数据");
+            thinkerTable.column("createTime", "记录时间").setWidth("160px");
 
-            thinkerTable.toolbar().defaultTools();
-
-        }).page().toString();
+        }).page();
     }
 
-    @RequestMapping(value = "/fileLogs.vue")
-    public String fileLogs() {
+    @RequestMapping(value = "/fileLogs")
+    public ThinkerResponse fileLogs() {
         return ThinkerAdmin.table(thinkerTable -> {
             thinkerTable.setApi("/restful/thinker/monitor/systemLogs/fileLogs");
 
             thinkerTable.column("text", "文件名称");
             thinkerTable.column("value", "文件路径");
-            thinkerTable.column("op", "操作").setWidth("80px")
-                    .button("download", "下载")
-                    .columnButtonClick("window.location.href='/thinker/admin/downloadLogs?path='+scope.row.text+'&"+
-                            ThinkerAdmin.properties().getToken().getTokenKey()+"='+this.$store.state.user.token");
+            thinkerTable.column("op", "操作").setWidth("80px").button(button -> {
+                button.setLabel("下载").setType("primary").setSize("small")
+                        .setOnClick("() => {" +
+                                "   window.open('/thinker/admin/downloadLogs?path='+slotData.row.text+'&"+ThinkerAdmin.properties().getToken().getTokenKey()+"='+$store.state.user.token);" +
+                                "}");
+            });
 
-            thinkerTable.toolbar().defaultTools();
-
-        }).page().toString();
+        }).page();
     }
 
-    @RequestMapping(value = "/server.vue")
-    public String server() {
+    @RequestMapping(value = "/server")
+    public ThinkerResponse server() {
         return ThinkerAdmin.table(thinkerTable -> {
             thinkerTable.setApi("/restful/thinker/monitor/systemLogs/server");
 
             thinkerTable.column("label", "参数名称");
             thinkerTable.column("value", "参数值");
 
-            thinkerTable.toolbar().defaultTools();
+            thinkerTable.getPagerConfig().setPageSize(1000);
 
-        }).page().toString();
+        }).page();
     }
 
-    @RequestMapping(value = "/generateSql.vue")
-    public String generateSql() {
+    @RequestMapping(value = "/generateSql")
+    public ThinkerResponse generateSql() {
         return ThinkerAdmin.table(thinkerTable -> {
             thinkerTable.setApi("/restful/thinker/monitor/systemLogs/fetchTables");
 
             thinkerTable.search(thinkerForm -> {
+                List<LabelValue> labelValues = new ArrayList<>();
+                try{
+                    String[] strings = ((DynamicRoutingDataSource) SpringContext.getBean(DynamicDataSourceAutoConfiguration.class).dataSource()).getDataSources().keySet().toArray(new String[]{});
+                    for (int i = 0; i < strings.length; i++) {
+                        labelValues.add(LabelValue.create(strings[i], strings[i]));
+                    }
+                } catch (Exception ignored) {
 
-                PageParams.setSetupSuffixScript(thinkerForm.getLayoutId() + "_formValue.value.datasourceName = '"+
-                        SpringContext.getBean(Environment.class).getProperty("spring.datasource.dynamic.primary")+"';");
-
-                thinkerForm.input("datasourceName", "数据源名称");
+                }
+                thinkerForm.select("datasourceName", "数据源名称").setOptions(labelValues);
                 thinkerForm.input("packageName", "生成包名称");
             });
 
-            thinkerTable.column("label", "表名称");
+            thinkerTable.checkbox().setWidth("60%").setField("label").setTitle("表名称");
             thinkerTable.column("value", "表描述");
 
-            thinkerTable.toolbar().defaultTools().button("generateSql", "生成").setType(ButtonType.SUCCESS).setIcon("Download")
-                    .setClick("let generateTables = [];" +
-                            "toRaw(unref(this."+thinkerTable.getLayoutId()+"_selectedData)).forEach(item => {" +
-                            "   generateTables.push(item.id);" +
-                            "});" +
-                            "window.open('/restful/thinker/monitor/systemLogs/genderateTables?tableNames='+generateTables.join(',')+'" +
-                            "&datasourceName='+this."+thinkerTable.getLayoutId()+"_formValue.datasourceName+'" +
-                            "&packageName='+this."+thinkerTable.getLayoutId()+"_formValue.packageName+'" +
-                            "&"+ThinkerAdmin.properties().getToken().getTokenKey()+"='+this.$store.state.user.token)");
+            thinkerTable.toolbar().button(elButton -> {
+                elButton.setLabel("生成").setType("success").setIcon("Download")
+                        .setOnClick("(e) => {" +
+                                        "   let generateTables = [];" +
+                                        "   slotData.$table.getCheckboxRecords(true).forEach(item => {" +
+                                        "       generateTables.push(item.label);" +
+                                        "   });" +
+                                        "   window.open('/restful/thinker/monitor/systemLogs/genderateTables?tableNames='+generateTables.join(',')+'" +
+                                        "&datasourceName='+slotData.$grid.reactData.formData.datasourceName+'" +
+                                        "&packageName='+slotData.$grid.reactData.formData.packageName+'" +
+                                        "&"+ThinkerAdmin.properties().getToken().getTokenKey()+"='+$store.state.user.token)" +
+                                        "}"
+                        );
+            });
 
-            thinkerTable.setPageSizes(Collections.singletonList(1000)).getPage().setSize(1000);
-        }).page().toString();
+            thinkerTable.getPagerConfig().setPageSize(1000);
+        }).page();
     }
 }

@@ -4,13 +4,13 @@ package @(packageName).serviceimpl;
 
 import @(packageName).entity.@(className);
 import @(packageName).mapper.@(className)Mapper;
-import @(packageName).service.@(className)Service;
+import @(packageName).service.I@(className)Service;
 import com.thinker.framework.framework.database.mybatis.ThinkerServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @@Service
 @@Transactional
-public class @(className)Impl extends ThinkerServiceImpl<@(className)Mapper, @(className)> implements @(className)Service {
+public class @(className)Impl extends ThinkerServiceImpl<@(className)Mapper, @(className)> implements I@(className)Service {
 
 }

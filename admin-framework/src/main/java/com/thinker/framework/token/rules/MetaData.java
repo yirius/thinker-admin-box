@@ -25,4 +25,10 @@ public class MetaData {
 
     // 当前路由不再菜单显示
     private boolean hideClose;
+
+    // 是否直接采用内部组件的json渲染，1是
+    private boolean isRender;
+
+    // 复写一下组件地址
+    private String component;
 }

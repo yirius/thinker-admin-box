@@ -159,7 +159,7 @@ public class GenerateSqlUtil {
     }
 
     public static String generateService(String packageName, String className) {
-        String filePath = ThinkerAdmin.file().getDirPath("generateSql/service/") + className + "Service.java";
+        String filePath = ThinkerAdmin.file().getDirPath("generateSql/service/") + "I" + className + "Service.java";
         FileUtil.writeString(thinkerrender.generates.service.template(
                 packageName, className
         ).render().toString(), filePath, StandardCharsets.UTF_8);

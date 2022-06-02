@@ -1,0 +1,42 @@
+@args(String url)
+
+@* <script> *@
+() =>{
+    var resultData = {};
+    for (var i in props.formValue) {
+        var data = Vue.toRaw(props.formValue[i]);
+        if (!AdminIs.isEmpty(data)) {
+            if (AdminIs.isObject(data)) {
+                resultData[i] = JSON.stringify(data);
+            } else if (AdminIs.isArray(data)) {
+                if (AdminIs.isObject(data[0])) {
+                    if (data[0].name && data[0].status && data[0].url) {
+                        var listValues = [];
+                        data.forEach(item => {
+                            if (item.response) {
+                            listValues.push({
+                                name: item.name,
+                                url: AdminTool.objects.findObjectValue(item.response.data, 0)
+                            });
+                        } else {
+                            listValues.push({
+                                name: item.name,
+                                url: item.url
+                            });
+                        }
+                    });
+                        resultData[i] = JSON.stringify(listValues);
+                    } else {
+                        resultData[i] = JSON.stringify(data);
+                    }
+                } else {
+                    resultData[i] = JSON.stringify(data);
+                }
+            } else {
+                resultData[i] = data;
+            }
+        }
+    }
+    console.log(resultData);
+}
+@* </script> *@

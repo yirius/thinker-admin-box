@@ -80,7 +80,9 @@ public class TkRulesRestful extends ThinkerRestful<TkRulesMapper, TkRules> {
     @Override
     public void _beforeSave(TkRules entity) {
         if(!entity.getComponent().equals("Layout") && !entity.getComponent().contains(".vue")) {
-            entity.setComponent(entity.getComponent() + ".vue");
+            if(entity.getIsRender() == 0) {
+                entity.setComponent(entity.getComponent() + ".vue");
+            }
         }
     }
 

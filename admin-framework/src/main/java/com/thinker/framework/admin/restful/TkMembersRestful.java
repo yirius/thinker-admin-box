@@ -3,6 +3,7 @@ package com.thinker.framework.admin.restful;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.Validator;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.thinker.framework.admin.entity.TkMember;
 import com.thinker.framework.admin.login.AdminLogin;
@@ -10,6 +11,7 @@ import com.thinker.framework.admin.mapper.TkMemberMapper;
 import com.thinker.framework.admin.serviceimpl.TkMemberImpl;
 import com.thinker.framework.framework.ThinkerAdmin;
 import com.thinker.framework.framework.aspect.logs.ThinkerTableLogAspect;
+import com.thinker.framework.framework.entity.vo.WrapperValue;
 import com.thinker.framework.framework.support.exceptions.ThinkerException;
 import com.thinker.framework.framework.utils.ToolsUtil;
 import com.thinker.framework.framework.widgets.ThinkerResponse;
@@ -32,6 +34,10 @@ public class TkMembersRestful extends ThinkerRestful<TkMemberMapper, TkMember> {
 
     public TkMembersRestful() {
         setUseTable(TkMemberImpl.class);
+
+        getUseWhere().add(new WrapperValue("username", "like"));
+        getUseWhere().add(new WrapperValue("phone", "like"));
+        getUseWhere().add(new WrapperValue("status", "eq"));
     }
 
     /**
@@ -59,14 +65,9 @@ public class TkMembersRestful extends ThinkerRestful<TkMemberMapper, TkMember> {
         data.put("salt", null);
         data.put("password", null);
 
-        List<Long> groupIds = new ArrayList<>();
-        if(Validator.isNotEmpty(data.get("groupIds"))) {
-            String[] strings = String.valueOf(data.get("groupIds")).split(",");
-            for (int i = 0; i < strings.length; i++) {
-                groupIds.add(Long.parseLong(strings[i]));
-            }
+        if(Validator.isNotEmpty(entity.getGroupIds())) {
+            data.put("groupIds", JSON.parseArray(entity.getGroupIds(), Long.class));
         }
-        data.put("groupIds", groupIds);
         return data;
     }
 

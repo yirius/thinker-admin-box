@@ -2,6 +2,9 @@ package com.thinker.framework.framework.entity.vo;
 
 import cn.hutool.core.lang.Dict;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LabelValue extends Dict {
 
     public LabelValue(){}
@@ -31,6 +34,15 @@ public class LabelValue extends Dict {
 
     public Object getValue() {
         return this.getOrDefault("value", null);
+    }
+
+    public LabelValue setChildren(List<LabelValue> children) {
+        this.put("children", children);
+        return this;
+    }
+
+    public List<LabelValue> getChildren() {
+        return (List<LabelValue>) this.getOrDefault("children", null);
     }
 
     public LabelValue set(String attr, Object value) {

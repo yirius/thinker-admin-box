@@ -1,9 +1,6 @@
 package com.thinker.framework.framework;
 
 import com.thinker.framework.framework.properties.ThinkerProperties;
-import com.thinker.framework.framework.renders.form.ThinkerForm;
-import com.thinker.framework.framework.renders.page.ThinkerPage;
-import com.thinker.framework.framework.renders.table.ThinkerTable;
 import com.thinker.framework.framework.service.RedisService;
 import com.thinker.framework.framework.service.ThreadService;
 import com.thinker.framework.framework.support.SpringContext;
@@ -11,6 +8,10 @@ import com.thinker.framework.framework.widgets.ThinkerEncrypt;
 import com.thinker.framework.framework.widgets.ThinkerFile;
 import com.thinker.framework.framework.widgets.ThinkerRequest;
 import com.thinker.framework.framework.widgets.ThinkerResponse;
+import com.thinker.framework.renders.ThinkerForm;
+import com.thinker.framework.renders.ThinkerPage;
+import com.thinker.framework.renders.ThinkerTable;
+import com.thinker.framework.renders.abstracts.RunClosure;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -93,20 +94,20 @@ public class ThinkerAdmin {
      * @return
      */
     public static ThinkerPage page() { return new ThinkerPage(); }
-    public static ThinkerPage page(ThinkerPage.Closure closure) { return new ThinkerPage(closure); }
+    public static ThinkerPage page(ThinkerPage.RunClosure closure) { return new ThinkerPage(closure); }
 
     /**
      * 列表样式
      * @return
      */
     public static ThinkerTable table() { return new ThinkerTable(); }
-    public static ThinkerTable table(ThinkerTable.Closure closure) { return new ThinkerTable(closure); }
+    public static ThinkerTable table(RunClosure<ThinkerTable> closure) { return new ThinkerTable().runClosure(closure); }
 
     /**
      * 列表样式
      * @return
      */
     public static ThinkerForm form() { return new ThinkerForm(); }
-    public static ThinkerForm form(ThinkerForm.Closure closure) { return new ThinkerForm(closure); }
+    public static ThinkerForm form(RunClosure<ThinkerForm> closure) { return new ThinkerForm().runClosure(closure); }
 
 }

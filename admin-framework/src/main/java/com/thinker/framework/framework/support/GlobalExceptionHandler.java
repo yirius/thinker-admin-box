@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
         // 记录校验参数
         log.warn("msg:"+msg+"|code:"+e.getCode());
 
-        return new ThinkerResponse().msg(msg).data(e.getData()).fail().code(e.getCode());
+        return new ThinkerResponse().msg(msg).local(e.getLocal()).data(e.getData()).fail().code(e.getCode());
     }
 
     /**

@@ -2,6 +2,7 @@ package com.thinker.framework.framework.utils;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.text.StrBuilder;
+import com.alibaba.fastjson.JSON;
 import com.thinker.framework.framework.ThinkerAdmin;
 
 import java.util.ArrayList;
@@ -95,10 +96,14 @@ public class ToolsUtil {
     public static List<String> strToList(String value) {
         List<String> valueList = new ArrayList<>();
         if(Validator.isNotEmpty(value)) {
-            String[] valueArr = value.split(",");
-            for (String s : valueArr) {
-                if (!valueList.contains(s)) {
-                    valueList.add(s);
+            if(value.startsWith("[") && value.endsWith("]")) {
+                valueList = JSON.parseArray(value, String.class);
+            } else {
+                String[] valueArr = value.split(",");
+                for (String s : valueArr) {
+                    if (!valueList.contains(s)) {
+                        valueList.add(s);
+                    }
                 }
             }
         }

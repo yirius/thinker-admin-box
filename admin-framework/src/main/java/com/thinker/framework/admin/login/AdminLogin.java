@@ -38,7 +38,7 @@ public class AdminLogin extends LoginAbstract<TkMember> {
     public TkMember getUser(Object username) {
         String findStr = String.valueOf(username).toLowerCase();
         if(Validator.isEmpty(findStr)) {
-            throw new ThinkerException("message.thinker.admin.emptyUsername", 201);
+            throw new ThinkerException("message.thinker.admin.emptyUsername", "用户名不能为空", 201);
         }
 
         TkMember tkMember = (TkMember) ThinkerAdmin.redis().hashGet("ADMIN_USERS", String.valueOf(findStr));
@@ -79,16 +79,18 @@ public class AdminLogin extends LoginAbstract<TkMember> {
             roleList = (List<TextValue>) ThinkerAdmin.redis().hashGet("ADMIN_USER_ROLES", String.valueOf(user.getId()));
             if(roleList == null) {
                 if(Validator.isNotEmpty(user.getGroupIds())) {
-                    List<String> strings = Arrays.asList(user.getGroupIds().split(","));
-                    roleList = SpringContext.getBean(TkGroupsImpl.class)
-                            .query().in("id", strings).eq("status", 1).list()
-                            .stream().map(tkGroups -> TextValue.create(tkGroups.getName(), tkGroups.getId())
-                                    .set("title", tkGroups.getTitle())
-                                    .set("rules", tkGroups.getRuleIds())
-                            )
-                            .collect(Collectors.toList());
+                    List<String> strings = JSON.parseArray(user.getGroupIds(), String.class);
+                    if(strings.size() > 0) {
+                        roleList = SpringContext.getBean(TkGroupsImpl.class)
+                                .query().in("id", strings).eq("status", 1).list()
+                                .stream().map(tkGroups -> TextValue.create(tkGroups.getName(), tkGroups.getId())
+                                        .set("title", tkGroups.getTitle())
+                                        .set("rules", tkGroups.getRuleIds())
+                                )
+                                .collect(Collectors.toList());
 
-                    ThinkerAdmin.redis().hashSet("ADMIN_USER_ROLES", String.valueOf(user.getId()), roleList);
+                        ThinkerAdmin.redis().hashSet("ADMIN_USER_ROLES", String.valueOf(user.getId()), roleList);
+                    }
                 }
             }
         }
@@ -120,17 +122,17 @@ public class AdminLogin extends LoginAbstract<TkMember> {
         TkMember tkMember = getUser(username);
 
         if(tkMember == null) {
-            throw new ThinkerException("message.thinker.admin.userNotFound", 202);
+            throw new ThinkerException("message.thinker.admin.userNotFound", "用户未找到，请您检查用户名", 202);
         }
 
         if(!tkMember.getStatus().equals(1)) {
-            throw new ThinkerException("message.thinker.admin.userStatusFail", 203);
+            throw new ThinkerException("message.thinker.admin.userStatusFail", "用户状态异常，无法登录", 203);
         }
 
         if(verifyPassword(password, tkMember)) {
             return getLoginResult(tkMember);
         } else {
-            throw new ThinkerException("message.thinker.admin.passwordIncorrect", 204);
+            throw new ThinkerException("message.thinker.admin.passwordIncorrect", "用户提交密码不正确，请仔细确认输入正确", 204);
         }
     }
 
@@ -144,7 +146,7 @@ public class AdminLogin extends LoginAbstract<TkMember> {
     @Override
     public String createPassword(String password, TkMember user) {
         if(Validator.isEmpty(password)) {
-            throw new ThinkerException("message.thinker.admin.emptyPassword", 205);
+            throw new ThinkerException("message.thinker.admin.emptyPassword", "密码为空，请填写", 205);
         }
 
         return SecureUtil.sha1(SecureUtil.md5(password).toUpperCase() + user.getSalt()).toUpperCase();
@@ -175,15 +177,15 @@ public class AdminLogin extends LoginAbstract<TkMember> {
         TkMember tkMember = getUser(id);
 
         if(tkMember == null) {
-            throw new ThinkerException("message.thinker.admin.userNotFound", 202);
+            throw new ThinkerException("message.thinker.admin.userNotFound", "用户未找到，请您检查用户名", 202);
         }
 
         if(Validator.isEmpty(oldPassword) || Validator.isEmpty(newPassword)) {
-            throw new ThinkerException("message.thinker.admin.emptyPassword", 205);
+            throw new ThinkerException("message.thinker.admin.emptyPassword", "密码为空，请填写", 205);
         }
 
         if(!verifyPassword(oldPassword, tkMember)) {
-            throw new ThinkerException("message.thinker.admin.passwordIncorrect", 204);
+            throw new ThinkerException("message.thinker.admin.passwordIncorrect", "用户提交密码不正确，请仔细确认输入正确", 204);
         }
 
         tkMember.setSalt(ToolsUtil.rand(6, ToolsUtil.RandFormat.NUMBER));

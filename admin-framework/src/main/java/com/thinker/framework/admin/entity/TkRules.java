@@ -23,6 +23,9 @@ public class TkRules extends ThinkerEntity {
     // 是否路由，向前端返回
     private Integer isRouter;
 
+    // 是否直接采用内部组件的json渲染，1是
+    private Integer isRender;
+
     @NotBlank(message = "中文名称必须填写")
     private String title;
 

@@ -8,21 +8,20 @@ import com.thinker.framework.admin.serviceimpl.TkGroupsImpl;
 import com.thinker.framework.admin.serviceimpl.TkRulesImpl;
 import com.thinker.framework.framework.ThinkerAdmin;
 import com.thinker.framework.framework.entity.vo.LabelValue;
-import com.thinker.framework.framework.renders.PageParams;
-import com.thinker.framework.framework.renders.bo.CheckboxItems;
-import com.thinker.framework.framework.renders.bo.TinymceTemplate;
-import com.thinker.framework.framework.renders.form.assemblys.Date;
-import com.thinker.framework.framework.renders.form.assemblys.Input;
-import com.thinker.framework.framework.renders.form.assemblys.Upload;
 import com.thinker.framework.framework.support.SpringContext;
+import com.thinker.framework.framework.widgets.ThinkerResponse;
+import com.thinker.framework.renders.DefineComponent;
+import com.thinker.framework.renders.assemblys.page.ElPopconfirm;
+import com.thinker.framework.renders.entity.enums.InputTypeEnum;
+import com.thinker.framework.renders.entity.table.CellRender;
+import com.thinker.framework.renders.entity.table.EditRuleItem;
+import com.thinker.framework.renders.entity.table.TreeConfig;
 import com.thinker.framework.token.extend.ThinkerController;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,68 +29,76 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/thinker/system")
 public class SystemController extends ThinkerController {
 
-    @RequestMapping(value = "/rules.vue")
-    public String rules()  {
+    @RequestMapping(value = "/rules")
+    public ThinkerResponse rules()  {
         return ThinkerAdmin.table(thinkerTable -> {
-            thinkerTable.setApi("/restful/thinker/system/rules").setEditUrl("/thinker/system/rulesEdit.vue");
+            thinkerTable.setApi("/restful/thinker/system/rules").setEditUrl("/thinker/system/rulesEdit");
 
+            thinkerTable.seq().setTreeNode(true).setWidth("120px");
             thinkerTable.column("id", "id");
             thinkerTable.column("title", "中文名称");
             thinkerTable.column("titleEn", "英文名称");
-            thinkerTable.column("name", "语言名称").openSortable();
-            thinkerTable.column("op", "操作").edit().delete().setWidth("180px");
+            thinkerTable.column("name", "语言名称");
+            // 渲染菜单
+            renderOperateColumn(thinkerTable, "操作", null, null, null, ElPopconfirm::deleteUsePassword);
 
-            thinkerTable.toolbar().add().delete().xlsx().defaultTools();
+            thinkerTable.setCheckboxConfig(null);
+            thinkerTable.setTreeConfig(new TreeConfig());
 
-            thinkerTable.setDefaultExpandAll(true).setPageSizes(Arrays.asList(100,500,1000)).getPage().setSize(500);
+            thinkerTable.getPagerConfig().setPageSize(10000);
+            thinkerTable.getPagerConfig().setPageSizes(Collections.singletonList(1000));
 
-        }).page().toString();
+        }).page();
     }
 
-    @RequestMapping(value = "/rulesEdit.vue")
-    public String rulesEdit() {
+    @RequestMapping(value = "/rulesEdit")
+    public ThinkerResponse rulesEdit() {
         return ThinkerAdmin.form(thinkerForm -> {
-            thinkerForm.setParseSetupData(
-                    "if("+thinkerForm.getLayoutId() + "_formValue.value.component == 'Layout') {" +
-                    "   "+ thinkerForm.getLayoutId() + "_component_disabled.value = true;" +
-                    "   "+ thinkerForm.getLayoutId() + "_isLayout_disabled.value = true;" +
-                    "}" + "if("+thinkerForm.getLayoutId() + "_formValue.value.parentId == 0) {" +
-                            "   "+ thinkerForm.getLayoutId() + "_parentId_disabled.value = true;" +
-                            "}");
+            DefineComponent.addRenderDataReady(
+                    "var componentRender = nextProp.viewBasePageRef.value.findRender('component');" +
+                            "if(componentRender) { componentRender.attrs.disabled = nextProp.formValue.component == 'Layout'; }" +
+                            "var isLayoutRender = nextProp.viewBasePageRef.value.findRender('isLayout');" +
+                            "if(isLayoutRender) { isLayoutRender.attrs.disabled = nextProp.formValue.component == 'Layout'; }" +
+                            "var parentIdRender = nextProp.viewBasePageRef.value.findRender('parentId');" +
+                            "if(parentIdRender) { parentIdRender.attrs.disabled = nextProp.formValue.parentId == 0; }");
 
             thinkerForm.tabPane("基础参数", "baseFields", thinkerTabPane -> {
                 thinkerTabPane.openRow();
 
-                thinkerTabPane.input("parentId", "上级ID").createDisabled().openRowCol().setXs(24);
+                thinkerTabPane.input("parentId", "上级ID").setDisabled(false).openRowCol().setXs(24);
                 thinkerTabPane.input("name", "短参数名").openRowCol().setXs(24);
                 thinkerTabPane.input("title", "中文名称").openRowCol().setXs(24);
                 thinkerTabPane.input("titleEn", "英文名称").openRowCol().setXs(24);
                 thinkerTabPane.input("path", "显示路径").openRowCol().setXs(24);
                 thinkerTabPane.input("redirect", "重定向路径").openRowCol().setXs(24);
 
-                thinkerTabPane.switchs("isLayout", "是否主组件")
-                        .setChange(
-                                "this."+ thinkerForm.getLayoutId() + "_formValue.component = 'Layout';" +
-                                "this."+ thinkerForm.getLayoutId() + "_component_disabled = val == 1;"
-                        ).createDisabled().openRowCol().setSpan(6).setXs(12);
+                thinkerTabPane.switchs("isLayout", "是否主组件").setDisabled(false)
+                        .setOnChange("(val) => { " +
+                                     "   props.modelRefsValue.component.value = val == 1 ? 'Layout' : '';" +
+                                     "   var componentRender = fieldIdOperate.find('component');" +
+                                     "   if(componentRender) { componentRender.attrs.disabled = val == 1; }" +
+                                     "}"
+                        ).openRowCol().setSpan(6).setXs(12);
 
                 thinkerTabPane.switchs("isRouter", "是否路由").openRowCol().setSpan(6).setXs(12);
 
-                thinkerTabPane.input("component", "组件地址").createDisabled().openRowCol().setSpan(12).setXs(24);
+                thinkerTabPane.input("component", "组件地址").setDisabled(false).openRowCol().setSpan(12).setXs(24);
             });
 
             thinkerForm.tabPane("可选参数", "chooseFields", thinkerTabPane -> {
                 thinkerTabPane.openRow();
+
                 thinkerTabPane.input("icon", "图标选择").openRowCol().setSpan(24);
-                thinkerTabPane.input("weight", "权重(越大越靠后)").setType(Input.InputType.NUMBER).openRowCol().setSpan(24);
+                thinkerTabPane.input("weight", "权重(大数靠后)").setType(InputTypeEnum.NUMBER).openRowCol().setSpan(24);
 
                 thinkerTabPane.switchs("alwayShow", "持续侧边打开").openRowCol().setSpan(8).setXs(12);
                 thinkerTabPane.switchs("cache", "是否缓存").openRowCol().setSpan(8).setXs(12);
                 thinkerTabPane.switchs("hideTab", "TAB不展示").openRowCol().setSpan(8).setXs(12);
                 thinkerTabPane.switchs("hideMenu", "菜单不展示").openRowCol().setSpan(8).setXs(12);
                 thinkerTabPane.switchs("hideClose", "不可关闭")
-                        .setBeforeChange("if(this.layer.rowIdKey==1 || this.layer.rowIdKey==2) {ElMessage.info('初始仪表无法设置可关闭')} return !(this.layer.rowIdKey==1 || this.layer.rowIdKey==2);")
+                        .setBeforeChange("() => { if(props.useIdKey==1||props.useIdKey==2) {elementPlus.ElMessage.info('初始仪表无法设置可关闭')} return !(props.useIdKey==1||props.useIdKey==2); }")
                         .openRowCol().setSpan(8).setXs(12);
+                thinkerTabPane.switchs("isRender", "JSON渲染").openRowCol().setSpan(8).setXs(12);
             });
 
             thinkerForm.tabPane("下级菜单", "subChildrens", thinkerTabPane -> {
@@ -104,92 +111,109 @@ public class SystemController extends ThinkerController {
                 thinkerTabPane.switchs("needDeleteBtn", "添加删除按钮").openRowCol().setXs(24);
             });
 
-        }).setSubmitUrl("/restful/thinker/system/rules").page().toString();
+        }).setApi("/restful/thinker/system/rules").page();
     }
 
     /**
      * 角色管理
      * @return
      */
-    @RequestMapping(value = "/roles.vue")
-    public String roles()  {
+    @RequestMapping(value = "/roles")
+    public ThinkerResponse roles()  {
         return ThinkerAdmin.table(thinkerTable -> {
-            thinkerTable.setApi("/restful/thinker/system/roles").setEditUrl("/thinker/system/rolesEdit.vue");
+            thinkerTable.setApi("/restful/thinker/system/roles").setEditUrl("/thinker/system/rolesEdit");
 
+            thinkerTable.checkbox();
             thinkerTable.column("id", "id");
             thinkerTable.column("title", "名称");
-            thinkerTable.column("op", "操作").edit().delete(button -> {
-                button.openPopConfirm().confirmDeleteUsePassword(thinkerTable.getLayoutId(), "id", thinkerTable.getApi());
-            }).setWidth("180px");
-
-            thinkerTable.toolbar().add().delete(button -> {
-                button.openPopConfirm().confirmDeleteUsePassword(thinkerTable.getLayoutId(), "id", thinkerTable.getApi());
-            }).defaultTools();
-        }).page().toString();
+            // 渲染菜单
+            renderOperateColumn(thinkerTable, "操作", null, null, null, ElPopconfirm::deleteUsePassword);
+        }).page();
     }
 
-    @RequestMapping(value = "/rolesEdit.vue")
-    public String rolesEdit() {
+    @RequestMapping(value = "/rolesEdit")
+    public ThinkerResponse rolesEdit() {
         return ThinkerAdmin.form(thinkerForm -> {
             thinkerForm.input("title", "组别名称");
             thinkerForm.input("name", "英文代号");
 
-            thinkerForm.tree("ruleIds", "可用规则");
-            PageParams.setSetupSuffixScript(
-                    "getRequest('/restful/thinker/system/roles/getRuleIds', {}).then(response => {" +
-                            "   "+thinkerForm.getLayoutId()+"_ruleIds_data.value = response.data;" +
-                            "});"
-            );
+            thinkerForm.tree("ruleIds", "可用规则").setData(parseLabelValue(
+                    TreeUtil.build(
+                            SpringContext.getBean(TkRulesImpl.class)
+                                    .query().orderByAsc("parent_id").list()
+                                    .stream()
+                                    .map(tkRules -> new TreeNode<>(tkRules.getId(), tkRules.getParentId(), tkRules.getTitle(), tkRules.getWeight()))
+                                    .collect(Collectors.toList()),
+                            0L
+                    ))).setShowCheckbox(true);
 
             thinkerForm.switchs("status", "角色状态");
+        }).setApi("/restful/thinker/system/roles").page();
+    }
+    /**
+     * 计算所有的规则
+     * @param treeNodes
+     * @return
+     */
+    private List<LabelValue> parseLabelValue(List<Tree<Long>> treeNodes) {
+        return treeNodes.stream().map(nodeItem -> {
+            if(nodeItem.getChildren() != null && nodeItem.getChildren().size() > 0) {
+                return LabelValue.create(nodeItem.getName().toString(), nodeItem.getId()).set("children", parseLabelValue(nodeItem.getChildren()));
+            }
 
-        }).setSubmitUrl("/restful/thinker/system/roles").page().toString();
+            return LabelValue.create(nodeItem.getName().toString(), nodeItem.getId());
+        }).collect(Collectors.toList());
     }
 
     /**
      * 成员管理
      * @return
      */
-    @RequestMapping(value = "/members.vue")
-    public String members()  {
+    @RequestMapping(value = "/members")
+    public ThinkerResponse members()  {
         return ThinkerAdmin.table(thinkerTable -> {
-            thinkerTable.setApi("/restful/thinker/system/members").setEditUrl("/thinker/system/membersEdit.vue");
+            thinkerTable.setApi("/restful/thinker/system/members").setEditUrl("/thinker/system/membersEdit");
 
-            thinkerTable.column("id", "id");
-            thinkerTable.column("username", "账户名");
-            thinkerTable.column("phone", "手机号");
-            thinkerTable.column("realname", "真实姓名");
-            thinkerTable.column("op", "操作").edit().delete(button -> {
-                button.openPopConfirm().confirmDeleteUsePassword(thinkerTable.getLayoutId(), "id", thinkerTable.getApi());
-            }).setWidth("180px");
+            thinkerTable.search(thinkerForm -> {
+                thinkerForm.input("username", "账户名");
+                thinkerForm.input("phone", "手机号");
+                thinkerForm.select("status", "状态").addOptions(quickLabelValues(
+                        new Object[]{"全部", ""},
+                        new Object[]{"可使用", 1},
+                        new Object[]{"不可用", 0}
+                )).setPlaceholder("--请选择状态--");
+            });
 
-            thinkerTable.toolbar().add().delete(button -> {
-                button.openPopConfirm().confirmDeleteUsePassword(thinkerTable.getLayoutId(), "id", thinkerTable.getApi());
-            }).defaultTools();
-        }).page().toString();
+            thinkerTable.checkbox();
+            thinkerTable.column("username", "账户名").setMinWidth("120px");
+            thinkerTable.column("phone", "手机号").setMinWidth("120px").setSortable(true);
+            thinkerTable.column("realname", "真实姓名").setMinWidth("120px");
+            // 渲染菜单
+            renderOperateColumn(thinkerTable, "操作", null, null, null, ElPopconfirm::deleteUsePassword);
+        }).page();
     }
 
-    @RequestMapping(value = "/membersEdit.vue")
-    public String membersEdit() {
+    @RequestMapping(value = "/membersEdit")
+    public ThinkerResponse membersEdit() {
         return ThinkerAdmin.form(thinkerForm -> {
-            thinkerForm.setParseSetupData("if(props.layer.rowIdKey&&props.layer.rowIdKey==1) {" +
-                    "   " + thinkerForm.getLayoutId() + "_groupIds_disabled.value = true;" +
-                    "   " + thinkerForm.getLayoutId() + "_status_disabled.value = true;" +
+            DefineComponent.addRenderReady("if(props.useIdKey && props.useIdKey == 1) {" +
+                    "   renderValue.render.children[0].children[5].children[0].attrs.disabled = true;" +
+                    "   renderValue.render.children[0].children[6].children[0].attrs.disabled = true;" +
                     "}");
 
             thinkerForm.input("username", "账户名");
             thinkerForm.input("phone", "手机号");
             thinkerForm.input("realname", "真实姓名");
-            thinkerForm.input("password", "密码").setType(Input.InputType.PASSWORD);
-            thinkerForm.input("remarks", "备注").setType(Input.InputType.TEXTAREA);
+            thinkerForm.input("password", "密码").setType(InputTypeEnum.PASSWORD);
+            thinkerForm.input("remarks", "备注").setType(InputTypeEnum.TEXTAREA);
 
-            thinkerForm.select("groupIds", "对应角色组").setOptions(
+            thinkerForm.select("groupIds", "对应角色组").addOptions(
                     SpringContext.getBean(TkGroupsImpl.class).query().eq("status", 1).list()
                             .stream().map(tkGroups -> LabelValue.create(tkGroups.getTitle(), tkGroups.getId()))
                             .collect(Collectors.toList())
-            ).setMultiple(true).createDisabled();
+            ).setMultiple(true).setDisabled(false);
 
-            thinkerForm.switchs("status", "角色状态").createDisabled();
-        }).setSubmitUrl("/restful/thinker/system/members").page().toString();
+            thinkerForm.switchs("status", "角色状态").setDisabled(false);
+        }).setApi("/restful/thinker/system/members").page();
     }
 }

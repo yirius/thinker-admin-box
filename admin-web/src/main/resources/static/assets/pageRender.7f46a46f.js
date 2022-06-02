@@ -1,0 +1,1 @@
+const h=(g,e,n)=>{let r=e.match(new RegExp(g,"g"));return r!=null&&r.length>0?a(e,r,n,0):[e]},a=(g,e,n,r)=>{let p=[];var t=g.split(e[r]);return p.push(t[0]),p.push(n[e[r].replace("`${","").replace("}`","")]),t[1]&&e.length>r+1&&(p=[...p,...a(t[1],e,n,++r)]),p};export{h as regexpMatchAndReplace,a as replaceRegexpVar};

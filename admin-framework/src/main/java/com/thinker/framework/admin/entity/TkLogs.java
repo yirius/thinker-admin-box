@@ -16,4 +16,7 @@ public class TkLogs extends ThinkerEntity {
     private Long userId;
     private Integer userType;
     private String content;
+    private String stages;
+    private String typeName;
+    private String message;
 }

@@ -10,6 +10,8 @@ import com.thinker.framework.framework.abstracts.LoginAbstract;
 import com.thinker.framework.framework.entity.vo.TextValue;
 import com.thinker.framework.framework.factory.LoginFactory;
 import com.thinker.framework.framework.support.SpringContext;
+import com.thinker.framework.framework.support.exceptions.ThinkerException;
+import com.thinker.framework.framework.utils.CacheUtil;
 import com.thinker.framework.framework.utils.ToolsUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -67,5 +69,36 @@ public class ThreadTokenUtil {
         }
 
         return rolesIdsList;
+    }
+
+    public static List<String> findUserUrlPageType(Long userId, int accessType, String urlPath) {
+        List<String> havePageType = new ArrayList<>();
+
+        if(CacheUtil.getRuleComponentsMap().containsValue(urlPath)) {
+            // 找到用户可用的规则id
+            List<String> userRuleIds = getUserRuleIds(userId, accessType);
+            // 找到所有的规则，进行一次计算
+            Map<String, String> componentMap = CacheUtil.getRuleComponentsMap();
+            for (String ruleId : componentMap.keySet()) {
+                // 如果用户可以适用这个规则，并且规则的component=当前网址，可以找这个规则对应的pageType
+                if(userRuleIds.contains(ruleId) && componentMap.get(ruleId).equals(urlPath)) {
+                    List<TkRules> tkRulesList = CacheUtil.getAdminRules();
+                    // 如果能找到，罗列出来url名下的所有pageType
+                    for (int i = 0; i < tkRulesList.size(); i++) {
+                        // 如果可以使用这个规则，并且是当前界面
+                        if(userRuleIds.contains(tkRulesList.get(i).getId().toString()) &&
+                                tkRulesList.get(i).getParentId().equals(Long.parseLong(ruleId))) {
+                            if(Validator.isNotEmpty(tkRulesList.get(i).getPageType())) {
+                                havePageType.add(tkRulesList.get(i).getPageType());
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+
+        }
+
+        return havePageType;
     }
 }

@@ -6,8 +6,10 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNode;
 import cn.hutool.core.lang.tree.TreeUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.thinker.framework.admin.entity.TkGroups;
+import com.thinker.framework.admin.entity.TkRules;
 import com.thinker.framework.admin.mapper.TkGroupsMapper;
 import com.thinker.framework.admin.serviceimpl.TkGroupsImpl;
 import com.thinker.framework.admin.serviceimpl.TkRulesImpl;
@@ -24,9 +26,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -52,6 +52,45 @@ public class TkGroupsRestful extends ThinkerRestful<TkGroupsMapper, TkGroups> {
     }
 
     @Override
+    public void _beforeSave(TkGroups entity) {
+        if(Validator.isNotEmpty(entity.getRuleIds())) {
+            List<Long> ruleIds = JSON.parseArray(entity.getRuleIds(), Long.class);
+            if(ruleIds.size() == 0) {
+                throw new ThinkerException("规则未选择");
+            }
+
+            // 需要加入所有的parentid
+            List<Long> parentIds = findParentIds(ruleIds);
+            for (int i = 0; i < parentIds.size(); i++) {
+                if(!ruleIds.contains(parentIds.get(i))) {
+                    ruleIds.add(parentIds.get(i));
+                }
+            }
+
+            ruleIds.sort(Comparator.comparingInt(Long::intValue));
+
+            entity.setRuleIds(JSON.toJSONString(ruleIds));
+        }
+    }
+
+    /**
+     * 找到上级菜单
+     * @param ruleIds
+     * @return
+     */
+    private List<Long> findParentIds(List<Long> ruleIds) {
+        List<Long> parentIds = SpringContext.getBean(TkRulesImpl.class)
+                .query().in("id", ruleIds)
+                .ne("parent_id", 0).select("parent_id").list().stream().map(TkRules::getParentId).collect(Collectors.toList());
+
+        if(parentIds.size() > 0) {
+            parentIds.addAll(findParentIds(parentIds));
+        }
+
+        return parentIds;
+    }
+
+    @Override
     @ThinkerTableLogAspect
     public ThinkerResponse delete(String ids, String password) {
         return super.delete(ids, password);
@@ -60,8 +99,19 @@ public class TkGroupsRestful extends ThinkerRestful<TkGroupsMapper, TkGroups> {
     @Override
     public Object _afterRead(TkGroups entity) {
         Map<String, Object> map = BeanUtil.beanToMap(entity);
-        map.put("ruleIds", Validator.isEmpty(entity.getRuleIds()) ? new JSONArray() :
-                Arrays.stream(entity.getRuleIds().split(",")).map(Long::parseLong).collect(Collectors.toList()));
+
+        // 计算ruleid，去掉顶层parentid
+        List<Long> ruleIds = Validator.isEmpty(entity.getRuleIds()) ? new ArrayList<>() : JSON.parseArray(entity.getRuleIds(), Long.class);
+
+        // 找到所有的parentid，做去除
+        List<TkRules> tkRulesList = SpringContext.getBean(TkRulesImpl.class).query().in("id", ruleIds).select("parent_id").list();
+        tkRulesList.forEach(tkRules -> {
+            if(tkRules.getParentId() != 0) {
+                ruleIds.remove(tkRules.getParentId());
+            }
+        });
+
+        map.put("ruleIds", ruleIds);
         return map;
     }
 

@@ -2,6 +2,7 @@ package com.thinker.framework.framework.aspect.logs;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.core.lang.Validator;
 import com.alibaba.fastjson.JSON;
 import com.thinker.framework.admin.entity.TkLogs;
 import com.thinker.framework.admin.serviceimpl.TkLogsImpl;
@@ -70,12 +71,10 @@ public class TableLogAopAdvice {
             }
         });
 
-        String content = "["+joinPoint.getSignature().getDeclaringTypeName()+"."+
-                joinPoint.getSignature().getName()+"::"+type+"]["+
-                (thinkerTableLogAspect != null ? thinkerTableLogAspect.value() : "")+"]"+
-                msg + JSON.toJSONString(paramData);
-
-        TkLogs tkLogs = new TkLogs().setContent(content);
+        TkLogs tkLogs = new TkLogs().setContent(JSON.toJSONString(paramData))
+                .setStages(joinPoint.getSignature().getDeclaringTypeName()+"."+joinPoint.getSignature().getName()+"::"+type)
+                .setTypeName((thinkerTableLogAspect != null ? thinkerTableLogAspect.value() : ""))
+                .setMessage(Validator.isEmpty(msg) ? "" : (msg.length() > 4096 ? msg.substring(0, 4096) : msg));
         if(TokenFactory.loadToken().isLogin()) {
             Dict tokenInfo = TokenFactory.loadToken().checkLogin();
             Long userId = tokenInfo.getLong(ThinkerAdmin.properties().getToken().getIdKey());
