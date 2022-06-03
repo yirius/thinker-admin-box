@@ -55,12 +55,14 @@ public class SystemController extends ThinkerController {
     public ThinkerResponse rulesEdit() {
         return ThinkerAdmin.form(thinkerForm -> {
             DefineComponent.addRenderDataReady(
-                    "var componentRender = nextProp.viewBasePageRef.value.findRender('component');" +
-                            "if(componentRender) { componentRender.attrs.disabled = nextProp.formValue.component == 'Layout'; }" +
-                            "var isLayoutRender = nextProp.viewBasePageRef.value.findRender('isLayout');" +
-                            "if(isLayoutRender) { isLayoutRender.attrs.disabled = nextProp.formValue.component == 'Layout'; }" +
-                            "var parentIdRender = nextProp.viewBasePageRef.value.findRender('parentId');" +
-                            "if(parentIdRender) { parentIdRender.attrs.disabled = nextProp.formValue.parentId == 0; }");
+                    "if(nextProp.viewBasePageRef) {" +
+                            "   var componentRender = nextProp.viewBasePageRef.value.findRender('component');" +
+                            "   if(componentRender) { componentRender.attrs.disabled = nextProp.formValue.component == 'Layout'; }" +
+                            "   var isLayoutRender = nextProp.viewBasePageRef.value.findRender('isLayout');" +
+                            "   if(isLayoutRender) { isLayoutRender.attrs.disabled = nextProp.formValue.component == 'Layout'; }" +
+                            "   var parentIdRender = nextProp.viewBasePageRef.value.findRender('parentId');" +
+                            "   if(parentIdRender) { parentIdRender.attrs.disabled = nextProp.formValue.parentId == 0; }" +
+                            "}");
 
             thinkerForm.tabPane("基础参数", "baseFields", thinkerTabPane -> {
                 thinkerTabPane.openRow();
@@ -96,7 +98,7 @@ public class SystemController extends ThinkerController {
                 thinkerTabPane.switchs("hideTab", "TAB不展示").openRowCol().setSpan(8).setXs(12);
                 thinkerTabPane.switchs("hideMenu", "菜单不展示").openRowCol().setSpan(8).setXs(12);
                 thinkerTabPane.switchs("hideClose", "不可关闭")
-                        .setBeforeChange("() => { if(props.useIdKey==1||props.useIdKey==2) {elementPlus.ElMessage.info('初始仪表无法设置可关闭')} return !(props.useIdKey==1||props.useIdKey==2); }")
+                        .setBeforeChange("() => { if(props.useIdKey==1||props.useIdKey==2) {_elementPlus.ElMessage.info('初始仪表无法设置可关闭')} return !(props.useIdKey==1||props.useIdKey==2); }")
                         .openRowCol().setSpan(8).setXs(12);
                 thinkerTabPane.switchs("isRender", "JSON渲染").openRowCol().setSpan(8).setXs(12);
             });

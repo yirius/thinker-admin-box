@@ -91,7 +91,7 @@ public class ToolbarConfig {
                 .setIcon("CircleClose").setSize("small");
 
         elButton.setOnClick("(e) => { " +
-                "   elementPlus.ElMessageBox.prompt('请输入密码，验证后删除', '密码验证', {" +
+                "   _elementPlus.ElMessageBox.prompt('请输入密码，验证后删除', '密码验证', {" +
                 "       cancelButtonText: '取消'," +
                 "       confirmButtonText: '确认'," +
                 "       inputType: 'password'," +

@@ -188,7 +188,7 @@ public class ThinkerTable extends RootRender {
             importConfig = new ImportConfig();
         }
         importConfig.setImportMethod("(e) => {" +
-                "   return uploadHttpRequestApi({" +
+                "   return _uploadHttpRequestApi({" +
                 "       action: \""+url+"\"," +
                 "       filename: \"file\"," +
                 "       file: e.file," +
@@ -198,7 +198,7 @@ public class ThinkerTable extends RootRender {
                 "   }).then(response => {" +
                 "       " +
                 "   }).catch(response => {\n" +
-                "       VXETable.modal.message({ content: '导入失败，请检查数据是否正确！', status: 'error' });" +
+                "       _VXETable.modal.message({ content: '导入失败，请检查数据是否正确！', status: 'error' });" +
                 "   });" +
                 "}");
         return this;
@@ -359,6 +359,7 @@ public class ThinkerTable extends RootRender {
                 // 添加新的参数
                 formConfigItems.add(
                         new FormConfigItems()
+                                .setSpan(12)
                                 .setTitle(formResult.get(i).getAttrs().getStr("label"))
                                 .setField(formResult.get(i).getChildren().get(0).getAttrs().getStr("name"))
                                 .setItemRender(editRender)
@@ -400,7 +401,7 @@ public class ThinkerTable extends RootRender {
                         "   });" +
                         "   queryParams.limit = queryData.page.pageSize;" +
                         "   queryParams.page = queryData.page.currentPage;" +
-                        "   return RequestApi.getRequest(\""+api+"\", queryParams).then(response => response.data);" +
+                        "   return _RequestApi.getRequest(\""+api+"\", queryParams).then(response => response.data);" +
                         "}");
             }
 
@@ -409,8 +410,8 @@ public class ThinkerTable extends RootRender {
                         "   var deleteIds = [], extInfo = {};" +
                         "   if(deleteData.button&&deleteData.button.extInfo) extInfo = deleteData.button.extInfo;" +
                         "   deleteData.body.removeRecords.forEach(item => deleteIds.push(item.id));" +
-                        "   return RequestApi.deleteRequest(\""+api+"\", {ids: deleteIds.join(','), ...extInfo}).then(response => {" +
-                        "       (Vue.unref(vxeGrid||deleteData)).commitProxy('query');" +
+                        "   return _RequestApi.deleteRequest(\""+api+"\", {ids: deleteIds.join(','), ...extInfo}).then(response => {" +
+                        "       (_Vue.unref(vxeGrid||deleteData)).commitProxy('query');" +
                         "       return response.data;" +
                         "   });" +
                         "}");
@@ -443,7 +444,7 @@ public class ThinkerTable extends RootRender {
                     "   const formLayer = fieldIdOperate.find(\""+getId()+"_formlayer\");" +
                     "   formLayer.children[0].attrs.useIdKey = rowData.id;" +
                     "   formLayer.children[0].attrs.afterRender = (nextProp) => { " +
-                    "       RequestApi.getRequest(\""+api+"/\"+rowData.id).then(response => { " +
+                    "       _RequestApi.getRequest(\""+api+"/\"+rowData.id).then(response => { " +
                     "           for(var i in response.data) {" +
                     "               if(typeof nextProp.modelRefsValue[i] != 'undefined') {" +
                     "                   nextProp.modelRefsValue[i].value = response.data[i];" +
@@ -463,7 +464,7 @@ public class ThinkerTable extends RootRender {
                     "   formLayer.children[0].attrs.useIdKey = null;" +
                     "   formLayer.children[0].attrs.afterRender = (nextProp) => {" +
                     "       for(var valueKey in nextProp.formValue) {" +
-                    "           if(AdminIs.isArray(nextProp.formValue[valueKey])) {" +
+                    "           if(_AdminIs.isArray(nextProp.formValue[valueKey])) {" +
                     "               nextProp.modelRefsValue[valueKey].value = [];" +
                     "           } else {" +
                     "               nextProp.modelRefsValue[valueKey].value = null;" +

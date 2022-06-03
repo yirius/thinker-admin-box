@@ -84,7 +84,7 @@ public class MonitorController extends ThinkerController {
             thinkerTable.column("op", "操作").setWidth("80px").button(button -> {
                 button.setLabel("下载").setType("primary").setSize("small")
                         .setOnClick("() => {" +
-                                "   window.open('/thinker/admin/downloadLogs?path='+slotData.row.text+'&"+ThinkerAdmin.properties().getToken().getTokenKey()+"='+$store.state.user.token);" +
+                                "   window.open('/thinker/admin/downloadLogs?path='+slotData.row.text+'&"+ThinkerAdmin.properties().getToken().getTokenKey()+"='+_$store.state.user.token);" +
                                 "}");
             });
 
@@ -136,7 +136,7 @@ public class MonitorController extends ThinkerController {
                                         "   window.open('/restful/thinker/monitor/systemLogs/genderateTables?tableNames='+generateTables.join(',')+'" +
                                         "&datasourceName='+slotData.$grid.reactData.formData.datasourceName+'" +
                                         "&packageName='+slotData.$grid.reactData.formData.packageName+'" +
-                                        "&"+ThinkerAdmin.properties().getToken().getTokenKey()+"='+$store.state.user.token)" +
+                                        "&"+ThinkerAdmin.properties().getToken().getTokenKey()+"='+_$store.state.user.token)" +
                                         "}"
                         );
             });

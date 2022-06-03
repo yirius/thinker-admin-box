@@ -123,7 +123,7 @@ public class ThinkerForm extends FormRender {
             onSubmit = "($refs, triggerId) => { " +
                     "   var saveData = {};" +
                     "   for(var i in props.formValue) {" +
-                    "       if(AdminIs.isArray(props.formValue[i]) || AdminIs.isObject(props.formValue[i])) {" +
+                    "       if(_AdminIs.isArray(props.formValue[i]) || _AdminIs.isObject(props.formValue[i])) {" +
                     "           saveData[i] = JSON.stringify(props.formValue[i]);" +
                     "       } else {" +
                     "           saveData[i] = props.formValue[i]" +
@@ -131,7 +131,7 @@ public class ThinkerForm extends FormRender {
                     "   }" +
                     "   var extInfo = $refs[triggerId].layer.extInfo || {};" +
                     "   if(extInfo.id) saveData.id = extInfo.id;" +
-                    "   RequestApi.postRequest(\""+api+"\", saveData).then(response => {" +
+                    "   _RequestApi.postRequest(\""+api+"\", saveData).then(response => {" +
                     "       $refs[triggerId].layer.show = false;" +
                     "       var tableName = triggerId.replace('_formlayer', '');" +
                     "       if($refs[tableName]) { $refs[tableName].vxeGrid.commitProxy('query'); }" +

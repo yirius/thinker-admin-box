@@ -201,7 +201,7 @@ public class VxeColumn {
 
     public VxeColumn edit(RunClosure<ElButton> editButtonRun) {
         ElButton editButton = new ElButton().setLabel("编辑").setType("primary").setSize("small").setIcon("edit")
-                .setOnClick("(e) => { vm.emit('openEditLayer', Vue.toRaw(slotData.row)); }");
+                .setOnClick("(e) => { vm.emit('openEditLayer', _Vue.toRaw(slotData.row)); }");
         if(editButtonRun != null) {
             editButtonRun.run(editButton);
         }

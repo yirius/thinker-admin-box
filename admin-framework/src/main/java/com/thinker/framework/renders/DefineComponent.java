@@ -116,6 +116,25 @@ public class DefineComponent {
     }
 
     /**
+     * 添加一个新的组件
+     * @param path
+     * @param name
+     */
+    public static void addImportComponent(String path, String name) {
+        List<Dict> importComponent = getImportComponent();
+        importComponent.add(Dict.create().set("path", path).set("name", name));
+        ThinkerAdmin.thread().setObject("PAGE_RENDER_COMPONENT", importComponent);
+    }
+
+    public static List<Dict> getImportComponent() {
+        List<Dict> importComponent = (List<Dict>) ThinkerAdmin.thread().getObject("PAGE_RENDER_COMPONENT");
+        if(importComponent == null){
+            importComponent = new ArrayList<>();
+        }
+        return importComponent;
+    }
+
+    /**
      * 计算一下渲染id
      * @return
      */

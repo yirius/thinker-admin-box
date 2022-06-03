@@ -52,7 +52,7 @@ public class ElTree extends FormPluginRender<ElTree> {
 
         if(Validator.isEmpty(onCheck)) {
             onCheck = "(changeData, checkedNodes) => { " +
-                    "   props.modelRefsValue['"+getModelValue()+"'].value = AdminTool.objects.deepClone(checkedNodes.checkedKeys);" +
+                    "   props.modelRefsValue['"+getModelValue()+"'].value = _AdminTool.objects.deepClone(checkedNodes.checkedKeys);" +
                     "}";
         }
     }
