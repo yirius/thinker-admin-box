@@ -62,6 +62,10 @@ public class ElFormItem extends RootRender {
         return addFormPlugin(new ElInput(), field);
     }
 
+    public ElInputRange inputRange(String field) {
+        return addFormPlugin(new ElInputRange(), field);
+    }
+
     public ElInputNumber inputNumber(String field) {
         return addFormPlugin(new ElInputNumber(), field);
     }

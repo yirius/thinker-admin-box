@@ -44,13 +44,13 @@ public class ElCascaderProps {
     /**
      * 	指定选项的值为选项对象的某个属性值
      */
-    private String value;
+    private String value = "value";
 
-    private String label;
+    private String label = "label";
 
-    private String children;
+    private String children = "children";
 
-    private String disabled;
+    private String disabled = "disabled";
 
-    private String leaf;
+    private String leaf = "leaf";
 }

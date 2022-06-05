@@ -1,13 +1,16 @@
 package com.thinker.framework.renders.assemblys.table;
 
 import cn.hutool.core.lang.Dict;
+import cn.hutool.core.lang.Validator;
 import com.alibaba.fastjson.JSON;
 import com.thinker.framework.framework.entity.vo.LabelValue;
 import com.thinker.framework.renders.ThinkerTable;
 import com.thinker.framework.renders.abstracts.RootRender;
 import com.thinker.framework.renders.abstracts.RunClosure;
 import com.thinker.framework.renders.aspects.ToRenderAttrs;
+import com.thinker.framework.renders.assemblys.ThinkerTags;
 import com.thinker.framework.renders.assemblys.form.plugins.ElButton;
+import com.thinker.framework.renders.assemblys.page.ElImage;
 import com.thinker.framework.renders.assemblys.page.ElPopconfirm;
 import com.thinker.framework.renders.entity.table.*;
 import com.thinker.framework.renders.entity.enums.VxeColumnEnum;
@@ -185,6 +188,18 @@ public class VxeColumn {
         if(slots == null) slots = new VxeColumnSlots();
         slots.getDefaultTpl().add(render);
         return this;
+    }
+
+    public VxeColumn imgColumn(String imgName) {
+        if(tableIns != null) {
+            if(Validator.isEmpty(tableIns.getRowConfig().getHeight())) {
+                tableIns.getRowConfig().setHeight("60");
+            }
+            if(Validator.isEmpty(tableIns.getShowOverflow())) {
+                tableIns.setShowOverflow("[`eval`]true");
+            }
+        }
+        return addDefaultSlot(new ElImage().columnShow(imgName).setId(getField().replace(".", "_") + "_img"));
     }
 
     public VxeColumn button(RunClosure<ElButton> buttonRun) {

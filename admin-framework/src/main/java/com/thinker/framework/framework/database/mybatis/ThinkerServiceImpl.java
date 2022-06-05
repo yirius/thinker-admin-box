@@ -43,7 +43,12 @@ public class ThinkerServiceImpl<M extends ThinkerMapper<T>, T> extends ServiceIm
         thinkerWrapper.setPage(0);
         thinkerWrapper.select("count(*) as count");
 
-        return (Long) this.baseMapper.thinkersql(thinkerWrapper).get(0).get("count");
+        List<Map<String, Object>> mapList = this.baseMapper.thinkersql(thinkerWrapper);
+        if(mapList.size() > 1) {
+            return (long) mapList.size();
+        } else {
+            return (Long) this.baseMapper.thinkersql(thinkerWrapper).get(0).get("count");
+        }
     }
 
     @Override

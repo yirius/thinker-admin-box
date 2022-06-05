@@ -124,23 +124,6 @@ public class ElSelect extends FormPluginRender<ElSelect> {
     @ToRenderAttrs
     private String tagType;
 
-    private List<LabelValue> options;
-
-    // 添加组别
-    public ElSelect addGroupOptions(String label, List<LabelValue> options) {
-        this.options = options;
-        ElOptionGroup elOptionGroup = new ElOptionGroup();
-        elOptionGroup.setOptions(options).getAttrs().set("label", label);
-        getChildren().add(elOptionGroup);
-        return this;
-    }
-
-    public ElSelect addOptions(List<LabelValue> options) {
-        this.options = options;
-        getChildren().addAll(options.stream().map(labelValue -> (new ElOption()).setAttrs(labelValue)).collect(Collectors.toList()));
-        return this;
-    }
-
     @ToRenderAttrs(isEval = true)
     private String onChange;
 
@@ -159,9 +142,30 @@ public class ElSelect extends FormPluginRender<ElSelect> {
     @ToRenderAttrs(isEval = true)
     private String onFocus;
 
+    private List<LabelValue> options;
+
+    // 添加组别
+    public ElSelect addGroupOptions(String label, List<LabelValue> options) {
+        this.options = options;
+        ElOptionGroup elOptionGroup = new ElOptionGroup();
+        elOptionGroup.setOptions(options).getAttrs().set("label", label);
+        getChildren().add(elOptionGroup);
+        return this;
+    }
+
+    public ElSelect addOptions(List<LabelValue> options) {
+        this.options = options;
+        getChildren().addAll(options.stream().map(labelValue -> (new ElOption()).setAttrs(labelValue)).collect(Collectors.toList()));
+        return this;
+    }
+
     @Override
     public void beforeRender() {
         setComponent("ElSelect");
+
+        if(options != null) {
+            addOptions(options);
+        }
     }
 
     @Override

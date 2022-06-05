@@ -35,7 +35,7 @@ public class ThinkerPage {
     private String id = DefineComponent.getRenderId();
 
     // 默认的渲染方法
-    private RenderResult render = RenderResult.create("div", Dict.create().set("style", "padding: 10px;background-color: white").set("id", id));
+    private RenderResult render = RenderResult.create("div", Dict.create().set("style", "padding: 10px;background-color: white;height: calc(100% - 20px);border-radius: 4px;").set("id", id));
 
     // 设置
     @Setter(AccessLevel.NONE)
@@ -43,14 +43,18 @@ public class ThinkerPage {
 
     // 最后统一调用render
     public ThinkerResponse render() {
+        String pageMethodName = DefineComponent.getRenderId();
+
         if(Validator.isEmpty(render.getAttrs().get("id"))){
             // 如果没有id，就补充一下
-            render.getAttrs().set("id", DefineComponent.getRenderId());
+            render.getAttrs().set("id", pageMethodName);
         }
 
         // 最后渲染json
         render.getChildren().addAll(children.stream().map(rootRender -> {
-            rootRender.setId(render.getAttrs().getStr("id") + "_" + rootRender.getId());
+            if(!rootRender.getId().startsWith(pageMethodName)) {
+                rootRender.setId(render.getAttrs().getStr("id") + "_" + rootRender.getId());
+            }
             return rootRender.render();
         }).collect(Collectors.toList()));
 

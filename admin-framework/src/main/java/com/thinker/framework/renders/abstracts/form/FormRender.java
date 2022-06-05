@@ -17,6 +17,11 @@ public abstract class FormRender extends RootRender {
         return addFormItem(field, label).input(field);
     }
 
+    // 添加input组件
+    public ElInputRange inputRange(String field, String label) {
+        return addFormItem(field, label).inputRange(field);
+    }
+
     // 添加inputNumber组件
     public ElInputNumber inputNumber(String field, String label) {
         return addFormItem(field, label).inputNumber(field);

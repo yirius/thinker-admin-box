@@ -27,6 +27,10 @@ import java.util.Map;
 @Accessors(chain = true)
 public class ThinkerForm extends FormRender {
 
+    public ThinkerForm() {
+        setId(DefineComponent.getRenderId() + "_" + getId());
+    }
+
     /**
      * 便捷方法运行
      * @param runClosure
@@ -108,11 +112,17 @@ public class ThinkerForm extends FormRender {
     private String onSubmit;
 
     public ThinkerResponse page() {
-        return page(thinkerPage -> thinkerPage.getChildren().add(this));
+        return page(null);
     }
 
     public ThinkerResponse page(ThinkerPage.RunClosure runClosure) {
-        return new ThinkerPage(runClosure).render();
+        return new ThinkerPage(thinkerPage -> {
+            thinkerPage.getChildren().add(this);
+
+            if(runClosure != null) {
+                runClosure.run(thinkerPage);
+            }
+        }).render();
     }
 
     @Override

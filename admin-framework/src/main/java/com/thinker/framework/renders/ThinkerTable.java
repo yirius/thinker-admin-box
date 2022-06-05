@@ -3,7 +3,6 @@ package com.thinker.framework.renders;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
 import com.thinker.framework.framework.widgets.ThinkerResponse;
 import com.thinker.framework.renders.abstracts.RootRender;
 import com.thinker.framework.renders.abstracts.RunClosure;
@@ -11,6 +10,7 @@ import com.thinker.framework.renders.abstracts.form.FormPluginRender;
 import com.thinker.framework.renders.aspects.ToRenderAttrs;
 import com.thinker.framework.renders.assemblys.ThinkerTags;
 import com.thinker.framework.renders.assemblys.form.plugins.ElSelect;
+import com.thinker.framework.renders.assemblys.page.ElImageViewer;
 import com.thinker.framework.renders.assemblys.page.LayerBox;
 import com.thinker.framework.renders.assemblys.table.VxeColumn;
 import com.thinker.framework.renders.entity.table.*;
@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,6 +34,10 @@ import java.util.stream.Collectors;
 @Setter
 @Accessors(chain = true)
 public class ThinkerTable extends RootRender {
+
+    public ThinkerTable() {
+        setId(DefineComponent.getRenderId() + "_" + getId());
+    }
 
     /**
      * 便捷方法运行
@@ -73,13 +78,13 @@ public class ThinkerTable extends RootRender {
     private Object data;
 
     @ToRenderAttrs
-    private String height;
+    private String height = "auto";
 
     @ToRenderAttrs
     private String maxHeight;
 
     @ToRenderAttrs
-    private Boolean autoResize;
+    private Boolean autoResize = true;
 
     @ToRenderAttrs
     private Boolean syncResize;
@@ -155,7 +160,7 @@ public class ThinkerTable extends RootRender {
 
     // 列配置信息
     @ToRenderAttrs(isJsonObject = true)
-    private ColumnConfig columnConfig;
+    private ColumnConfig columnConfig = new ColumnConfig().setMinWidth("100px");
 
     // 列配置信息
     @ToRenderAttrs(isJsonObject = true)
@@ -478,6 +483,10 @@ public class ThinkerTable extends RootRender {
                     "   formLayer.attrs.layer.show = true; " +
                     "}");
         }
+
+        // 补充一下几个props参数
+        getAttrs().set("modelRefsValue", "[`eval`]props.modelRefsValue");
+        getAttrs().set("useIdKey", "[`eval`]props.useIdKey");
     }
 
     @Override
@@ -487,16 +496,24 @@ public class ThinkerTable extends RootRender {
 
     // 界面相关
     public ThinkerResponse page() {
-        return page(thinkerPage -> {
+        return page(null);
+    }
+
+    public ThinkerResponse page(ThinkerPage.RunClosure runClosure) {
+        return new ThinkerPage(thinkerPage -> {
             thinkerPage.getChildren().add(this);
             if(formLayer != null) {
                 // 添加一下编辑界面
                 thinkerPage.getChildren().add(formLayer);
             }
-        });
-    }
 
-    public ThinkerResponse page(ThinkerPage.RunClosure runClosure) {
-        return new ThinkerPage(runClosure).render();
+            thinkerPage.getChildren().add(new ThinkerTags().runClosure(rootRender -> {
+                rootRender.getChildren().add(new ElImageViewer().setModelValue(getId()+"_img_viewer"));
+            }));
+
+            if(runClosure != null) {
+                runClosure.run(thinkerPage);
+            }
+        }).render();
     }
 }
