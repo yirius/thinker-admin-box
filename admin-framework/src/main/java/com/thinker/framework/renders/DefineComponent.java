@@ -116,6 +116,24 @@ public class DefineComponent {
     }
 
     /**
+     * 添加获取数据或重置数据完成之后的方法
+     * @param getDataBeforeStr
+     */
+    public static void addGetDataBefore(String getDataBeforeStr) {
+        List<String> getDataBefore = getGetDataBefore();
+        getDataBefore.add(getDataBeforeStr);
+        ThinkerAdmin.thread().setObject("PAGE_GET_DATA_BEFORE", getDataBefore);
+    }
+
+    public static List<String> getGetDataBefore() {
+        List<String> getDataBefore = (List<String>) ThinkerAdmin.thread().getObject("PAGE_GET_DATA_BEFORE");
+        if(getDataBefore == null){
+            getDataBefore = new ArrayList<>();
+        }
+        return getDataBefore;
+    }
+
+    /**
      * 添加一个新的组件
      * @param path
      * @param name

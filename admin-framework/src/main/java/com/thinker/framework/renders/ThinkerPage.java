@@ -64,6 +64,7 @@ public class ThinkerPage {
                         .set("render", render)
                         .set("renderReady", StrUtil.join("", DefineComponent.getRenderReady()))
                         .set("renderDataReady", StrUtil.join("", DefineComponent.getRenderDataReady()))
+                        .set("getDataBefore", StrUtil.join("", DefineComponent.getGetDataBefore()))
                         .set("components", DefineComponent.getImportComponent())
         ).success();
     }

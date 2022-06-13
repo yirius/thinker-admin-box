@@ -79,7 +79,7 @@ public class AdminLogin extends LoginAbstract<TkMember> {
             roleList = (List<TextValue>) ThinkerAdmin.redis().hashGet("ADMIN_USER_ROLES", String.valueOf(user.getId()));
             if(roleList == null) {
                 if(Validator.isNotEmpty(user.getGroupIds())) {
-                    List<String> strings = JSON.parseArray(user.getGroupIds(), String.class);
+                    List<String> strings = ToolsUtil.strToList(user.getGroupIds());
                     if(strings.size() > 0) {
                         roleList = SpringContext.getBean(TkGroupsImpl.class)
                                 .query().in("id", strings).eq("status", 1).list()

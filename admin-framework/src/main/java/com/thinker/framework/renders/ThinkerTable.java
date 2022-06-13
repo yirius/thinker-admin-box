@@ -449,7 +449,11 @@ public class ThinkerTable extends RootRender {
                     "   const formLayer = fieldIdOperate.find(\""+getId()+"_formlayer\");" +
                     "   formLayer.children[0].attrs.useIdKey = rowData.id;" +
                     "   formLayer.children[0].attrs.afterRender = (nextProp) => { " +
-                    "       _RequestApi.getRequest(\""+api+"/\"+rowData.id).then(response => { " +
+                    "       var sendData = {};" +
+                    "       if(nextProp.renderValue.getDataBefore) {\n" +
+                    "           eval(nextProp.renderValue.getDataBefore);\n" +
+                    "       }" +
+                    "       _RequestApi.getRequest(\""+api+"/\"+rowData.id, sendData).then(response => { " +
                     "           for(var i in response.data) {" +
                     "               if(typeof nextProp.modelRefsValue[i] != 'undefined') {" +
                     "                   nextProp.modelRefsValue[i].value = response.data[i];" +

@@ -33,11 +33,15 @@ public class LogAopAdvice {
     @Before("pointcut()")
     public void before(JoinPoint joinPoint) {
         Dict paramData = Dict.create();
-        ThinkerAdmin.request().getRequest().getParameterMap().forEach((s, strings) -> {
-            if(!s.toLowerCase().contains("password")) {
-                paramData.set(s, strings[0]);
-            }
-        });
+
+        HttpServletRequest httpServletRequest = ThinkerAdmin.request().getRequest();
+        if(httpServletRequest != null) {
+            httpServletRequest.getParameterMap().forEach((s, strings) -> {
+                if(!s.toLowerCase().contains("password")) {
+                    paramData.set(s, strings[0]);
+                }
+            });
+        }
 
         this.writeWarnLog(
                 joinPoint, "Before", JSON.toJSONString(paramData)

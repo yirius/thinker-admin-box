@@ -10,6 +10,8 @@ import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Slf4j
 @Aspect
 @Component
@@ -32,11 +34,15 @@ public class RedisLogAopAdvice {
     @Before("pointcut()")
     public void before(JoinPoint joinPoint) {
         Dict paramData = Dict.create();
-        ThinkerAdmin.request().getRequest().getParameterMap().forEach((s, strings) -> {
-            if(!s.toLowerCase().contains("password")) {
-                paramData.set(s, strings[0]);
-            }
-        });
+
+        HttpServletRequest httpServletRequest = ThinkerAdmin.request().getRequest();
+        if(httpServletRequest != null) {
+            httpServletRequest.getParameterMap().forEach((s, strings) -> {
+                if(!s.toLowerCase().contains("password")) {
+                    paramData.set(s, strings[0]);
+                }
+            });
+        }
 
         this.writeWarnLog(
                 joinPoint, "Before", JSON.toJSONString(paramData)

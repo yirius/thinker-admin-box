@@ -2,7 +2,6 @@ package com.thinker.framework.framework.aspect.logs;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Dict;
-import cn.hutool.core.lang.Validator;
 import com.alibaba.fastjson.JSON;
 import com.thinker.framework.admin.entity.TkLogs;
 import com.thinker.framework.admin.serviceimpl.TkLogsImpl;
@@ -65,17 +64,23 @@ public class TableLogAopAdvice {
         ThinkerTableLogAspect thinkerTableLogAspect = signature.getMethod().getAnnotation(ThinkerTableLogAspect.class);
 
         Dict paramData = Dict.create();
-        ThinkerAdmin.request().getRequest().getParameterMap().forEach((s, strings) -> {
-            if(!s.toLowerCase().contains("password")) {
-                paramData.set(s, strings[0]);
-            }
-        });
 
-        TkLogs tkLogs = new TkLogs().setContent(JSON.toJSONString(paramData))
-                .setStages(joinPoint.getSignature().getDeclaringTypeName()+"."+joinPoint.getSignature().getName()+"::"+type)
-                .setTypeName((thinkerTableLogAspect != null ? thinkerTableLogAspect.value() : ""))
-                .setMessage(Validator.isEmpty(msg) ? "" : (msg.length() > 4096 ? msg.substring(0, 4096) : msg));
-        if(TokenFactory.loadToken().isLogin()) {
+        HttpServletRequest httpServletRequest = ThinkerAdmin.request().getRequest();
+        if(httpServletRequest != null) {
+            httpServletRequest.getParameterMap().forEach((s, strings) -> {
+                if(!s.toLowerCase().contains("password")) {
+                    paramData.set(s, strings[0]);
+                }
+            });
+        }
+
+        String content = "["+joinPoint.getSignature().getDeclaringTypeName()+"."+
+                joinPoint.getSignature().getName()+"::"+type+"]["+
+                (thinkerTableLogAspect != null ? thinkerTableLogAspect.value() : "")+"]"+
+                msg + JSON.toJSONString(paramData);
+
+        TkLogs tkLogs = new TkLogs().setContent(content);
+        if(httpServletRequest != null && TokenFactory.loadToken().isLogin()) {
             Dict tokenInfo = TokenFactory.loadToken().checkLogin();
             Long userId = tokenInfo.getLong(ThinkerAdmin.properties().getToken().getIdKey());
             int accessType = tokenInfo.getInt(ThinkerAdmin.properties().getToken().getTypeKey());
