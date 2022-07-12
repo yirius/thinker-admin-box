@@ -114,7 +114,7 @@ public class JwtUtil {
                 return tokenInfo;
             }
         } catch (JWTDecodeException e) {
-            throw new ThinkerException("message.thinker.token.inValid", 1001);
+            throw new ThinkerException("message.thinker.token.inValid", "当前TOKEN不合法", 1001);
         }
     }
 }

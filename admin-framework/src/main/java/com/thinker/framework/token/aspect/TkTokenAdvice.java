@@ -89,7 +89,7 @@ public class TkTokenAdvice {
                     }
                 }
                 if(!isAllRight) {
-                    throw new ThinkerException("message.thinker.token.noPermission", 501);
+                    throw new ThinkerException("message.thinker.token.noPermission", "暂无权限访问该模块", 501);
                 }
             }
         }
@@ -111,7 +111,7 @@ public class TkTokenAdvice {
             if(checkRuleAspect != null && Validator.isNotEmpty(checkRuleAspect.name())) {
                 // 如果存在name，就直接匹配
                 if(!haveRuleComponents.contains(checkRuleAspect.name())) {
-                    throw new ThinkerException("message.thinker.token.noPermission", 501);
+                    throw new ThinkerException("message.thinker.token.noPermission", "暂无权限访问该模块", 501);
                 }
             } else {
                 // 找到基本路径，然后run一下匹配规则
@@ -119,7 +119,7 @@ public class TkTokenAdvice {
                 if(currentUrl.toLowerCase().contains(".vue")) {
                     // 如果存在.vue，需要全匹配
                     if(!haveRuleComponents.contains(currentUrl)) {
-                        throw new ThinkerException("message.thinker.token.noPermission", 501);
+                        throw new ThinkerException("message.thinker.token.noPermission", "暂无权限访问该模块", 501);
                     }
                 } else {
                     // 如果是其他的，需要进行(全/半匹配)
@@ -133,7 +133,7 @@ public class TkTokenAdvice {
                             }
                         }
                         if(!isHalfMatch) {
-                            throw new ThinkerException("message.thinker.token.noPermission", 501);
+                            throw new ThinkerException("message.thinker.token.noPermission", "暂无权限访问该模块", 501);
                         }
                     }
                 }

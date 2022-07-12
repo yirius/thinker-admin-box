@@ -126,17 +126,17 @@ public class ThinkerRestful<M extends ThinkerMapper<T>, T> extends ThinkerContro
     @RequestMapping(method = RequestMethod.DELETE)
     public ThinkerResponse delete(String ids, String password) {
         if(Validator.isEmpty(ids)) {
-            return new ThinkerResponse().msg("message.thinker.admin.emptyData").fail();
+            return new ThinkerResponse().local("message.thinker.admin.emptyData").msg("未提交数据").fail();
         }
 
         if(deleteNeedPassword) {
             LoginAbstract<T> loginAbstract = LoginFactory.loadLogin();
             if(Validator.isEmpty(password)) {
-                return new ThinkerResponse().msg("message.thinker.admin.emptyPassword").fail();
+                return new ThinkerResponse().local("message.thinker.admin.emptyPassword").msg("密码为空，请填写").fail();
             }
 
             if(!loginAbstract.verifyPassword(password, loginAbstract.getUser(TokenFactory.loadToken().getLoginId()))) {
-                return new ThinkerResponse().msg("message.thinker.admin.passwordIncorrect").fail();
+                return new ThinkerResponse().local("message.thinker.admin.passwordIncorrect").msg("用户提交密码不正确，请仔细确认输入正确").fail();
             }
         }
 
@@ -144,7 +144,7 @@ public class ThinkerRestful<M extends ThinkerMapper<T>, T> extends ThinkerContro
         getTableImpl().removeByIds(idsStr);
         _afterDelete(idsStr);
 
-        return new ThinkerResponse().msg("message.thinker.admin.deleteSuccess").success();
+        return new ThinkerResponse().local("message.thinker.admin.deleteSuccess").msg("删除成功").success();
     }
 
     public List<String> _beforeDelete(String ids) {

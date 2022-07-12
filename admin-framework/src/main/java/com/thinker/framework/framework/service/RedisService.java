@@ -1,6 +1,7 @@
 package com.thinker.framework.framework.service;
 
 import com.thinker.framework.framework.support.driver.CacheDriver;
+import com.thinker.framework.framework.support.exceptions.ThinkerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -91,7 +92,7 @@ public class RedisService extends CacheDriver {
     @Override
     public Long inc(String key, Long delta) {
         if (delta < 0) {
-            throw new RuntimeException("message.thinker.exceptions.incFactorZero");
+            throw new ThinkerException("message.thinker.exceptions.incFactorZero", "递增因子必须大于0", 0);
         }
         return redisTemplate.opsForValue().increment(this.getCacheKey(key), delta);
     }
@@ -104,7 +105,7 @@ public class RedisService extends CacheDriver {
     @Override
     public Long dec(String key, Long delta) {
         if (delta < 0) {
-            throw new RuntimeException("message.thinker.exceptions.decFactorZero");
+            throw new ThinkerException("message.thinker.exceptions.decFactorZero", "递减因子必须大于0", 0);
         }
         return redisTemplate.opsForValue().decrement(this.getCacheKey(key), delta);
     }

@@ -5,6 +5,7 @@ import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.io.FileTypeUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.Validator;
 import com.thinker.framework.framework.ThinkerAdmin;
 import com.thinker.framework.framework.support.exceptions.ThinkerException;
@@ -97,12 +98,19 @@ public class UploadService {
                                     }
                                 }
                             } else {
-                                throw new ThinkerException("message.thinker.uploads.mkdirError|{\"file\":\""+multipartFile.getOriginalFilename()+"\"}", 360);
+                                throw new ThinkerException(
+                                        "message.thinker.uploads.mkdirError",
+                                        multipartFile.getOriginalFilename()+"上传失败, 创建文件夹失败", 360, Dict.create().set("field", multipartFile.getOriginalFilename())
+                                );
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
 
-                            throw new ThinkerException("message.thinker.uploads.uploadError|{\"file\":\""+multipartFile.getOriginalFilename()+"\",\"reason\":\""+e.getMessage(), 361);
+                            throw new ThinkerException(
+                                    "message.thinker.uploads.uploadError",
+                                    multipartFile.getOriginalFilename()+"上传失败, 原因:"+e.getMessage(), 361,
+                                    Dict.create().set("field", multipartFile.getOriginalFilename()).set("reason", e.getMessage())
+                            );
                         }
                     }
 
@@ -153,8 +161,11 @@ public class UploadService {
 
         if(isImage) {
             if(multipartFile.getSize() > ThinkerAdmin.properties().getConfig().getUploadImageSize()) {
-                throw new ThinkerException("message.thinker.uploads.sizeMaxError|{\"file\":\""+multipartFile.getOriginalFilename()
-                        +"\",\"size\":\""+(ThinkerAdmin.properties().getConfig().getUploadImageSize()/1000000)+"\"}", 362);
+                throw new ThinkerException(
+                        "message.thinker.uploads.sizeMaxError",
+                        multipartFile.getOriginalFilename()+"大小超过限制:"+(ThinkerAdmin.properties().getConfig().getUploadImageSize()/1000000)+"MB", 362,
+                        Dict.create().set("file", multipartFile.getOriginalFilename()).set("size", (ThinkerAdmin.properties().getConfig().getUploadImageSize()/1000000))
+                );
             }
 
             if(imageSuffixList == null) {
@@ -162,12 +173,15 @@ public class UploadService {
             }
 
             if(!imageSuffixList.contains(fileSuffix)) {
-                throw new ThinkerException("message.thinker.uploads.suffixError|{\"suffix\":\""+fileSuffix+"\"}", 363);
+                throw new ThinkerException("message.thinker.uploads.suffixError", fileSuffix+"格式不符合要求", 363, Dict.create().set("suffix", fileSuffix));
             }
         } else {
             if(multipartFile.getSize() > ThinkerAdmin.properties().getConfig().getUploadFileSize()) {
-                throw new ThinkerException("message.thinker.uploads.sizeMaxError|{\"file\":\""+multipartFile.getOriginalFilename()
-                        +"\",\"size\":\""+(ThinkerAdmin.properties().getConfig().getUploadFileSize()/1000000)+"\"}", 362);
+                throw new ThinkerException(
+                        "message.thinker.uploads.sizeMaxError",
+                        multipartFile.getOriginalFilename()+"大小超过限制:"+(ThinkerAdmin.properties().getConfig().getUploadImageSize()/1000000)+"MB", 362,
+                        Dict.create().set("file", multipartFile.getOriginalFilename()).set("size", (ThinkerAdmin.properties().getConfig().getUploadImageSize()/1000000))
+                );
             }
 
             if(fileSuffixList == null) {
@@ -175,7 +189,7 @@ public class UploadService {
             }
 
             if(!fileSuffixList.contains(fileSuffix)) {
-                throw new ThinkerException("message.thinker.uploads.suffixError|{\"suffix\":\""+fileSuffix+"\"}", 363);
+                throw new ThinkerException("message.thinker.uploads.suffixError", fileSuffix+"格式不符合要求", 363, Dict.create().set("suffix", fileSuffix));
             }
         }
 

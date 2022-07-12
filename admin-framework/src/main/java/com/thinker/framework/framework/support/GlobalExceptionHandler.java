@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public ThinkerResponse handleException(Exception e){
         log.error("系统内部异常，异常信息", e);
-        return new ThinkerResponse().msg("message.thinker.exceptions.systemError|"+ JSON.toJSONString(Dict.create().set("err", e.getMessage()))).fail();
+        return new ThinkerResponse().local("message.thinker.exceptions.systemError").msg("系统内部异常:"+e.getMessage()).data(Dict.create().set("err", e.getMessage())).fail();
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.thinker.framework.framework.properties.thinker;
 
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ClassUtil;
 import com.thinker.framework.framework.abstracts.SignAbstract;
 import com.thinker.framework.framework.abstracts.defaultimpl.SignAspectDefaultImpl;
@@ -31,7 +32,7 @@ public class TokenProperties {
      */
     public AuthTableConstant getAuthTableUseType(int accessType) {
         if(accessType >= getAuthTable().size() || accessType < 0) {
-            throw new ThinkerException("message.thinker.exceptions.indexError|{\"field\":\"AuthTable\"}");
+            throw new ThinkerException("message.thinker.exceptions.indexError", "AuthTable超出边界条件", 0, Dict.create().set("field", "AuthTable"));
         }
 
         // 获取到登录信息
@@ -45,7 +46,7 @@ public class TokenProperties {
      */
     public SignAbstract getSignAspectUseType(int signIndex) {
         if(signIndex >= getSignAspect().size() || signIndex < 0) {
-            throw new ThinkerException("message.thinker.exceptions.indexError|{\"field\":\"SignAspect\"}");
+            throw new ThinkerException("message.thinker.exceptions.indexError", "SignAspect超出边界条件", 0, Dict.create().set("field", "SignAspect"));
         }
 
         try{

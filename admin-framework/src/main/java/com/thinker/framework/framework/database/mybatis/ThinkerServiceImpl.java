@@ -57,11 +57,11 @@ public class ThinkerServiceImpl<M extends ThinkerMapper<T>, T> extends ServiceIm
         DatabaseUtil.checkWrapperFields(getCurrentModel(), thinkerWrapper, this.getBaseMapper());
 
         if(Validator.isEmpty(thinkerWrapper.getFieldUpdateStr())) {
-            throw new UpdateException("message.thinker.exceptions.updateNoParam", 450);
+            throw new UpdateException("message.thinker.exceptions.updateNoParam", "暂无更新参数", 450);
         }
 
         if(Validator.isEmpty(thinkerWrapper.getCustomSqlSegment())) {
-            throw new UpdateException("message.thinker.exceptions.updateNoWhere", 451);
+            throw new UpdateException("message.thinker.exceptions.updateNoWhere", "暂无更新条件", 451);
         }
 
         return this.baseMapper.thinkerupdate(thinkerWrapper) > 0;

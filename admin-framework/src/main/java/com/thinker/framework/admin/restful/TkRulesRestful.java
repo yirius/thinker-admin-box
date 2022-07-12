@@ -165,7 +165,7 @@ public class TkRulesRestful extends ThinkerRestful<TkRulesMapper, TkRules> {
             }
         }
         if(!canDelete) {
-            throw new ThinkerException("message.thinker.admin.notDelete", 206);
+            throw new ThinkerException("message.thinker.admin.notDelete", "密码为空，请填写", 206);
         }
     }
 }

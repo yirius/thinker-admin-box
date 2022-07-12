@@ -1,5 +1,6 @@
 package com.thinker.framework.framework.database.relation.parser;
 
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
@@ -107,7 +108,10 @@ public class EntityConfig {
                 if(originData.containsKey(oriField)) {
                     strBuilder.append(originData.get(oriField));
                 } else {
-                    throw new LazyWithFillException("message.thinker.exceptions.fillNoField|{\"field\":\""+oriField+"\"}", 440);
+                    throw new LazyWithFillException(
+                            "message.thinker.exceptions.fillNoField",
+                            "数据中不存在参数"+oriField+",无法进行填充", 440, Dict.create().set("field", oriField)
+                    );
                 }
             } else {
                 strBuilder.append(

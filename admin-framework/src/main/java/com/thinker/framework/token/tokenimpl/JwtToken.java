@@ -118,7 +118,7 @@ public class JwtToken extends TokenAbstract {
                 } else {
                     // IP不一致，则不能登录
                     if(!currentIp.equals(ThinkerAdmin.request().getIp())) {
-                        throw new NotLoginException("message.thinker.token.tokenMulti", 1001);
+                        throw new NotLoginException("message.thinker.token.tokenMulti", "当前账户同时登录过多", 1001);
                     }
                 }
             }
@@ -126,7 +126,7 @@ public class JwtToken extends TokenAbstract {
             if(!ThinkerAdmin.redis().has(EXPIRED_PREV+"_"+tokenMd5)) {
                 // 进行校验
                 if(!JwtUtil.verify(tokenValue, authTableConstant.getSecret())) {
-                    throw new NotLoginException("message.thinker.token.inValid", 1001);
+                    throw new NotLoginException("message.thinker.token.inValid", "当前TOKEN不合法", 1001);
                 }
                 ThinkerAdmin.redis().set(
                         EXPIRED_PREV+"_"+tokenMd5,
@@ -141,7 +141,7 @@ public class JwtToken extends TokenAbstract {
             return tokenInfo;
         }
 
-        throw new NotLoginException("message.thinker.token.emptyToken", 1001);
+        throw new NotLoginException("message.thinker.token.emptyToken", "TOKEN为空，无法校验", 1001);
     }
 
     /**

@@ -11,12 +11,34 @@ public class LazyWithFillException extends Exception{
         return code;
     }
 
-    public LazyWithFillException(String message) {
+    private String local = null;
+    private Object data = null;
+
+    public LazyWithFillException(String local, String message, int code, Object data) {
         super(message);
+        this.code = code;
+        this.data = data;
+        this.local = local;
+    }
+
+    public LazyWithFillException(String message, int code, Object data) {
+        super(message);
+        this.code = code;
+        this.data = data;
     }
 
     public LazyWithFillException(String message, int code) {
         super(message);
         this.code = code;
+    }
+
+    public LazyWithFillException(String local, String message, int code) {
+        super(message);
+        this.code = code;
+        this.local = local;
+    }
+
+    public LazyWithFillException(String message) {
+        super(message);
     }
 }

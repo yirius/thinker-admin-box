@@ -151,7 +151,7 @@ public class TkGroupsRestful extends ThinkerRestful<TkGroupsMapper, TkGroups> {
     public List<String> _beforeDelete(String ids) {
         List<String> deleteIds = Arrays.asList(ids.split(","));
         if(deleteIds.contains("1")) {
-            throw new ThinkerException("message.thinker.admin.notDelete|{\"reason\":\"超级管理员id=1\"}", 206);
+            throw new ThinkerException("message.thinker.admin.notDelete", "无法删除初始超级管理员", 206, Dict.create().set("reason", "超级管理员id=1"));
         }
         return deleteIds;
     }

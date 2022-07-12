@@ -5,6 +5,8 @@ import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNode;
 import cn.hutool.core.lang.tree.TreeUtil;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
+import com.thinker.framework.admin.entity.TkRules;
 import com.thinker.framework.admin.serviceimpl.TkGroupsImpl;
 import com.thinker.framework.admin.serviceimpl.TkRulesImpl;
 import com.thinker.framework.framework.ThinkerAdmin;
@@ -157,32 +159,25 @@ public class SystemController extends ThinkerController {
             Long userId = tokenInfo.getLong(ThinkerAdmin.properties().getToken().getIdKey());
             int accessType = tokenInfo.getInt(ThinkerAdmin.properties().getToken().getTypeKey());
 
-            if(accessType == 0 && userId == 1) {
-                thinkerForm.tree("ruleIds", "可用规则").setData(parseLabelValue(
-                        TreeUtil.build(
-                                SpringContext.getBean(TkRulesImpl.class)
-                                        .query().orderByAsc("parent_id").list()
-                                        .stream()
-                                        .map(tkRules -> new TreeNode<>(tkRules.getId(), tkRules.getParentId(), tkRules.getTitle(), tkRules.getWeight()))
-                                        .collect(Collectors.toList()),
-                                0L
-                        ))).setShowCheckbox(true);
-            } else {
+            QueryChainWrapper<TkRules> queryChainWrapper = SpringContext.getBean(TkRulesImpl.class).query().orderByAsc("parent_id");
+
+            if(!(accessType == 0 && userId == 1)) {
                 List<String> ruleIds = ThreadTokenUtil.getUserRuleIds(
                         Long.parseLong(String.valueOf(TokenFactory.loadToken().getLoginId())),
                         TokenFactory.loadToken().getLoginType()
                 );
 
-                thinkerForm.tree("ruleIds", "可用规则").setData(parseLabelValue(
-                        TreeUtil.build(
-                                SpringContext.getBean(TkRulesImpl.class)
-                                        .query().orderByAsc("parent_id").in("id", ruleIds).list()
-                                        .stream()
-                                        .map(tkRules -> new TreeNode<>(tkRules.getId(), tkRules.getParentId(), tkRules.getTitle(), tkRules.getWeight()))
-                                        .collect(Collectors.toList()),
-                                0L
-                        ))).setShowCheckbox(true);
+                queryChainWrapper.in("id", ruleIds);
             }
+
+            thinkerForm.tree("ruleIds", "可用规则").setData(parseLabelValue(
+                    TreeUtil.build(
+                            queryChainWrapper.list()
+                                    .stream()
+                                    .map(tkRules -> new TreeNode<>(tkRules.getId(), tkRules.getParentId(), tkRules.getTitle(), tkRules.getWeight()))
+                                    .collect(Collectors.toList()),
+                            0L
+                    ))).setShowCheckbox(true);
 
             thinkerForm.switchs("status", "角色状态");
         }).setApi("/restful/thinker/system/roles").page();
@@ -248,10 +243,13 @@ public class SystemController extends ThinkerController {
             thinkerForm.input("password", "密码").setType(InputTypeEnum.PASSWORD);
             thinkerForm.input("remarks", "备注").setType(InputTypeEnum.TEXTAREA);
 
+            Dict tokenInfo = TokenFactory.loadToken().checkLogin();
+
             thinkerForm.select("groupIds", "对应角色组").setOptions(
-                    SpringContext.getBean(TkGroupsImpl.class).query().eq("status", 1).list()
-                            .stream().map(tkGroups -> LabelValue.create(tkGroups.getTitle(), tkGroups.getId()))
-                            .collect(Collectors.toList())
+                    SpringContext.getBean(TkGroupsImpl.class).getCanUseGroups(
+                            tokenInfo.getLong(ThinkerAdmin.properties().getToken().getIdKey()),
+                            tokenInfo.getInt(ThinkerAdmin.properties().getToken().getTypeKey())
+                    )
             ).setMultiple(true).setDisabled(false);
 
             thinkerForm.switchs("status", "角色状态").setDisabled(false);
