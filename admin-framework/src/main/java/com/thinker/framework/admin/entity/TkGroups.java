@@ -22,4 +22,10 @@ public class TkGroups extends ThinkerEntity {
     private String ruleIds;
 
     private Integer status;
+
+    // 权限类型
+    private Integer accessType;
+
+    // 用户编号
+    private Long memberId;
 }

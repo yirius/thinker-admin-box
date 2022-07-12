@@ -4,10 +4,12 @@ import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNode;
 import cn.hutool.core.lang.tree.TreeUtil;
+import com.alibaba.fastjson.JSON;
 import com.thinker.framework.admin.serviceimpl.TkGroupsImpl;
 import com.thinker.framework.admin.serviceimpl.TkRulesImpl;
 import com.thinker.framework.framework.ThinkerAdmin;
 import com.thinker.framework.framework.entity.vo.LabelValue;
+import com.thinker.framework.framework.factory.LoginFactory;
 import com.thinker.framework.framework.support.SpringContext;
 import com.thinker.framework.framework.widgets.ThinkerResponse;
 import com.thinker.framework.renders.DefineComponent;
@@ -16,7 +18,11 @@ import com.thinker.framework.renders.entity.enums.InputTypeEnum;
 import com.thinker.framework.renders.entity.table.CellRender;
 import com.thinker.framework.renders.entity.table.EditRuleItem;
 import com.thinker.framework.renders.entity.table.TreeConfig;
+import com.thinker.framework.token.abstracts.TokenAbstract;
 import com.thinker.framework.token.extend.ThinkerController;
+import com.thinker.framework.token.factory.TokenFactory;
+import com.thinker.framework.token.util.JwtUtil;
+import com.thinker.framework.token.util.ThreadTokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -128,6 +134,14 @@ public class SystemController extends ThinkerController {
             thinkerTable.checkbox();
             thinkerTable.column("id", "id");
             thinkerTable.column("title", "名称");
+
+            // 如果是超级管理员，需要分配权限，能够看到是谁添加的
+            TokenAbstract tokenAbstract = TokenFactory.loadToken();
+            if(tokenAbstract.isLogin() && tokenAbstract.getLoginType() == 0) {
+                thinkerTable.column("accessType", "权限类型");
+                thinkerTable.column("memberId", "归属用户");
+            }
+
             // 渲染菜单
             renderOperateColumn(thinkerTable, "操作", null, null, null, ElPopconfirm::deleteUsePassword);
         }).page();
@@ -139,19 +153,41 @@ public class SystemController extends ThinkerController {
             thinkerForm.input("title", "组别名称");
             thinkerForm.input("name", "英文代号");
 
-            thinkerForm.tree("ruleIds", "可用规则").setData(parseLabelValue(
-                    TreeUtil.build(
-                            SpringContext.getBean(TkRulesImpl.class)
-                                    .query().orderByAsc("parent_id").list()
-                                    .stream()
-                                    .map(tkRules -> new TreeNode<>(tkRules.getId(), tkRules.getParentId(), tkRules.getTitle(), tkRules.getWeight()))
-                                    .collect(Collectors.toList()),
-                            0L
-                    ))).setShowCheckbox(true);
+            Dict tokenInfo = TokenFactory.loadToken().checkLogin();
+            Long userId = tokenInfo.getLong(ThinkerAdmin.properties().getToken().getIdKey());
+            int accessType = tokenInfo.getInt(ThinkerAdmin.properties().getToken().getTypeKey());
+
+            if(accessType == 0 && userId == 1) {
+                thinkerForm.tree("ruleIds", "可用规则").setData(parseLabelValue(
+                        TreeUtil.build(
+                                SpringContext.getBean(TkRulesImpl.class)
+                                        .query().orderByAsc("parent_id").list()
+                                        .stream()
+                                        .map(tkRules -> new TreeNode<>(tkRules.getId(), tkRules.getParentId(), tkRules.getTitle(), tkRules.getWeight()))
+                                        .collect(Collectors.toList()),
+                                0L
+                        ))).setShowCheckbox(true);
+            } else {
+                List<String> ruleIds = ThreadTokenUtil.getUserRuleIds(
+                        Long.parseLong(String.valueOf(TokenFactory.loadToken().getLoginId())),
+                        TokenFactory.loadToken().getLoginType()
+                );
+
+                thinkerForm.tree("ruleIds", "可用规则").setData(parseLabelValue(
+                        TreeUtil.build(
+                                SpringContext.getBean(TkRulesImpl.class)
+                                        .query().orderByAsc("parent_id").in("id", ruleIds).list()
+                                        .stream()
+                                        .map(tkRules -> new TreeNode<>(tkRules.getId(), tkRules.getParentId(), tkRules.getTitle(), tkRules.getWeight()))
+                                        .collect(Collectors.toList()),
+                                0L
+                        ))).setShowCheckbox(true);
+            }
 
             thinkerForm.switchs("status", "角色状态");
         }).setApi("/restful/thinker/system/roles").page();
     }
+
     /**
      * 计算所有的规则
      * @param treeNodes
@@ -201,6 +237,9 @@ public class SystemController extends ThinkerController {
             DefineComponent.addRenderReady("if(props.useIdKey && props.useIdKey == 1) {" +
                     "   renderValue.render.children[0].children[5].children[0].attrs.disabled = true;" +
                     "   renderValue.render.children[0].children[6].children[0].attrs.disabled = true;" +
+                    "} else {" +
+                    "   renderValue.render.children[0].children[5].children[0].attrs.disabled = false;" +
+                    "   renderValue.render.children[0].children[6].children[0].attrs.disabled = false;" +
                     "}");
 
             thinkerForm.input("username", "账户名");
@@ -209,7 +248,7 @@ public class SystemController extends ThinkerController {
             thinkerForm.input("password", "密码").setType(InputTypeEnum.PASSWORD);
             thinkerForm.input("remarks", "备注").setType(InputTypeEnum.TEXTAREA);
 
-            thinkerForm.select("groupIds", "对应角色组").addOptions(
+            thinkerForm.select("groupIds", "对应角色组").setOptions(
                     SpringContext.getBean(TkGroupsImpl.class).query().eq("status", 1).list()
                             .stream().map(tkGroups -> LabelValue.create(tkGroups.getTitle(), tkGroups.getId()))
                             .collect(Collectors.toList())

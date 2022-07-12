@@ -4,10 +4,7 @@ import com.thinker.framework.framework.properties.ThinkerProperties;
 import com.thinker.framework.framework.service.RedisService;
 import com.thinker.framework.framework.service.ThreadService;
 import com.thinker.framework.framework.support.SpringContext;
-import com.thinker.framework.framework.widgets.ThinkerEncrypt;
-import com.thinker.framework.framework.widgets.ThinkerFile;
-import com.thinker.framework.framework.widgets.ThinkerRequest;
-import com.thinker.framework.framework.widgets.ThinkerResponse;
+import com.thinker.framework.framework.widgets.*;
 import com.thinker.framework.renders.ThinkerForm;
 import com.thinker.framework.renders.ThinkerPage;
 import com.thinker.framework.renders.ThinkerTable;
@@ -63,6 +60,17 @@ public class ThinkerAdmin {
             widgets.put("encrypt", new ThinkerEncrypt());
         }
         return (ThinkerEncrypt) widgets.get("encrypt");
+    }
+
+    /**
+     * 获取腾讯相关
+     * @return
+     */
+    public static ThinkerWechat wechat() {
+        if(!widgets.containsKey("wechat")) {
+            widgets.put("wechat", new ThinkerWechat());
+        }
+        return (ThinkerWechat) widgets.get("wechat");
     }
 
     /**

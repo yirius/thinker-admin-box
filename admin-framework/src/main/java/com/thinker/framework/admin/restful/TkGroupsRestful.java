@@ -20,7 +20,9 @@ import com.thinker.framework.framework.entity.vo.LabelValue;
 import com.thinker.framework.framework.support.SpringContext;
 import com.thinker.framework.framework.support.exceptions.ThinkerException;
 import com.thinker.framework.framework.widgets.ThinkerResponse;
+import com.thinker.framework.token.abstracts.TokenAbstract;
 import com.thinker.framework.token.extend.ThinkerRestful;
+import com.thinker.framework.token.factory.TokenFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +38,17 @@ public class TkGroupsRestful extends ThinkerRestful<TkGroupsMapper, TkGroups> {
 
     public TkGroupsRestful() {
         setUseTable(TkGroupsImpl.class);
+
+        setParserWrapper(thinkerWrapper -> {
+            Dict tokenInfo = TokenFactory.loadToken().checkLogin();
+            Long userId = tokenInfo.getLong(ThinkerAdmin.properties().getToken().getIdKey());
+            int accessType = tokenInfo.getInt(ThinkerAdmin.properties().getToken().getTypeKey());
+
+            if(accessType != 0) {
+                thinkerWrapper.eq("access_type", accessType);
+                thinkerWrapper.eq("member_id", userId);
+            }
+        });
     }
 
     /**
@@ -53,6 +66,17 @@ public class TkGroupsRestful extends ThinkerRestful<TkGroupsMapper, TkGroups> {
 
     @Override
     public void _beforeSave(TkGroups entity) {
+        TokenAbstract tokenAbstract = TokenFactory.loadToken();
+        if(!tokenAbstract.isLogin()) {
+            throw new ThinkerException("登录后才能进行角色添加");
+        }
+
+        // 如果是第一次添加，就设置参数
+        if(Validator.isEmpty(entity.getId())) {
+            entity.setAccessType(tokenAbstract.getLoginType());
+            entity.setMemberId(Long.parseLong(String.valueOf(tokenAbstract.getLoginId())));
+        }
+
         if(Validator.isNotEmpty(entity.getRuleIds())) {
             List<Long> ruleIds = JSON.parseArray(entity.getRuleIds(), Long.class);
             if(ruleIds.size() == 0) {
