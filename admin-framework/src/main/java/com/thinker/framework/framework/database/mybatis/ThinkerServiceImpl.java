@@ -2,6 +2,9 @@ package com.thinker.framework.framework.database.mybatis;
 
 import cn.hutool.core.lang.Validator;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.enums.SqlMethod;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.thinker.framework.framework.database.entity.ThinkerEntity;
 import com.thinker.framework.framework.database.exceptions.LazyWithFillException;
@@ -10,9 +13,11 @@ import com.thinker.framework.framework.database.services.pagelist.PageListServic
 import com.thinker.framework.framework.database.utils.DatabaseUtil;
 import com.thinker.framework.framework.database.wrapper.ThinkerWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.binding.MapperMethod;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
+import java.util.function.Function;
 
 @Slf4j
 public class ThinkerServiceImpl<M extends ThinkerMapper<T>, T> extends ServiceImpl<M, T> implements ThinkerIService<T> {
@@ -65,6 +70,17 @@ public class ThinkerServiceImpl<M extends ThinkerMapper<T>, T> extends ServiceIm
         }
 
         return this.baseMapper.thinkerupdate(thinkerWrapper) > 0;
+    }
+
+    @Override
+    public Boolean thinkerUpdateBatch(Collection<T> entityList, Function<T, QueryWrapper<T>> queryWrapperFunction) throws UpdateException {
+        String sqlStatement = this.getSqlStatement(SqlMethod.UPDATE);
+        return this.executeBatch(entityList, DEFAULT_BATCH_SIZE, (sqlSession, entity) -> {
+            MapperMethod.ParamMap<Object> param = new MapperMethod.ParamMap<>();
+            param.put(Constants.ENTITY, entity);
+            param.put(Constants.WRAPPER, queryWrapperFunction.apply(entity));
+            sqlSession.update(sqlStatement, param);
+        });
     }
 
     @Override

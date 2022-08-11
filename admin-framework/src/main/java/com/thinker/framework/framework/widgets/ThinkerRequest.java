@@ -29,11 +29,15 @@ public class ThinkerRequest {
      * @return
      */
     public String getRequestParam(HttpServletRequest httpServletRequest, String param) {
-        String paramValue = httpServletRequest.getParameter(param);
-        if(Validator.isEmpty(paramValue)) {
-            paramValue = httpServletRequest.getHeader(param);
+        if(httpServletRequest != null) {
+            String paramValue = httpServletRequest.getParameter(param);
+            if(Validator.isEmpty(paramValue)) {
+                paramValue = httpServletRequest.getHeader(param);
+            }
+            return paramValue;
+        } else {
+            return null;
         }
-        return paramValue;
     }
 
     public String getRequestParam(String param) {

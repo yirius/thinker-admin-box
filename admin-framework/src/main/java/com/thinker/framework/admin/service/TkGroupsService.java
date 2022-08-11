@@ -8,5 +8,6 @@ import javax.xml.soap.Text;
 import java.util.List;
 
 public interface TkGroupsService extends ThinkerIService<TkGroups> {
+    public List<LabelValue> getCanUseGroups();
     public List<LabelValue> getCanUseGroups(Long memberId, int accessType);
 }

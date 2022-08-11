@@ -152,6 +152,7 @@ public class TkRulesRestful extends ThinkerRestful<TkRulesMapper, TkRules> {
                 .setTitle(entity.getTitle() + title + "按钮").setTitleEn(entity.getTitleEn() + " "+titleEn+" Button")
                 .setIsLayout(0).setIsRouter(0)
                 .setName(entity.getName() + titleEn.replace(" ", "") + "Button")
+                .setPageType(titleEn.equals("Add")?"addBtn":(titleEn.equals("Edit")?"editBtn":(titleEn.equals("Delete")?"delBtn":"allDelBtn")))
                 .setWeight(weight);
     }
 
