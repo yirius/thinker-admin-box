@@ -1,6 +1,9 @@
 package com.thinker.framework.framework.database.mybatis;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.enums.SqlMethod;
@@ -14,6 +17,7 @@ import com.thinker.framework.framework.database.utils.DatabaseUtil;
 import com.thinker.framework.framework.database.wrapper.ThinkerWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.binding.MapperMethod;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
@@ -36,7 +40,14 @@ public class ThinkerServiceImpl<M extends ThinkerMapper<T>, T> extends ServiceIm
         // 找到对应的Entity
         Class<T> entityClass = (Class <T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
         // 转化
-        return JSON.parseArray(JSON.toJSONString(this.thinkerSelect(thinkerWrapper)), entityClass);
+        String resultStr = JSON.toJSONString(this.thinkerSelect(thinkerWrapper));
+        try{
+            return JSON.parseArray(resultStr, entityClass);
+        } catch (Exception err) {
+            log.error("thinkerList:" + resultStr);
+            err.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     @Override
@@ -73,12 +84,22 @@ public class ThinkerServiceImpl<M extends ThinkerMapper<T>, T> extends ServiceIm
     }
 
     @Override
+    @Transactional(rollbackFor = {Exception.class})
     public Boolean thinkerUpdateBatch(Collection<T> entityList, Function<T, QueryWrapper<T>> queryWrapperFunction) throws UpdateException {
         String sqlStatement = this.getSqlStatement(SqlMethod.UPDATE);
         return this.executeBatch(entityList, DEFAULT_BATCH_SIZE, (sqlSession, entity) -> {
             MapperMethod.ParamMap<Object> param = new MapperMethod.ParamMap<>();
             param.put(Constants.ENTITY, entity);
             param.put(Constants.WRAPPER, queryWrapperFunction.apply(entity));
+            try{
+                // 如果是批量更新，判断有没有创建时间，有的话去掉，改成更新时间
+                if(ReflectUtil.getFieldValue(entity, "createTime") != null) {
+                    ReflectUtil.setFieldValue(entity, "createTime", null);
+                    ReflectUtil.setFieldValue(entity, "updateTime", DateUtil.date().getTime());
+                }
+            } catch (Exception ignored) {
+                ignored.printStackTrace();
+            }
             sqlSession.update(sqlStatement, param);
         });
     }
