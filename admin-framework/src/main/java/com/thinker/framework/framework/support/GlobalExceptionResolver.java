@@ -14,7 +14,7 @@ public class GlobalExceptionResolver implements HandlerExceptionResolver {
     @Override
     public ModelAndView resolveException(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) {
 //        httpServletResponse.
-        if(!e.getMessage().contains("Broken pipe")) {
+        if(e.getLocalizedMessage() == null || !(e.getLocalizedMessage().contains("Broken pipe") || e.getLocalizedMessage().contains("Connection reset by peer"))) {
             log.info("err", e);
         }
         return null;

@@ -1,7 +1,11 @@
 package com.thinker.adminweb.api.controller;
 
+import cn.hutool.core.io.FileTypeUtil;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.crypto.SecureUtil;
+import com.alibaba.fastjson.JSON;
 import com.thinker.framework.framework.entity.vo.LabelValue;
+import com.thinker.framework.framework.support.SpringContext;
 import com.thinker.framework.framework.widgets.ThinkerResponse;
 import com.thinker.framework.renders.DefineComponent;
 import com.thinker.framework.renders.ThinkerForm;
@@ -12,11 +16,16 @@ import com.thinker.framework.renders.assemblys.form.plugins.ElRadio;
 import com.thinker.framework.renders.assemblys.form.plugins.ElUpload;
 import com.thinker.framework.renders.entity.table.*;
 import com.thinker.framework.renders.entity.enums.DateTypeEnum;
+import com.thinker.minio.MinioUtil;
+import io.minio.ObjectWriteResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/api/test")
 public class TestApi {

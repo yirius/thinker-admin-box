@@ -71,3 +71,10 @@ management:
     export:
       prometheus:
         descriptions: true
+
+#分布式文件存储
+minio:
+  endpoint: http://127.0.0.1:9000
+  accessKey: admin
+  secretKey: password
+  bucketName: datashare

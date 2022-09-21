@@ -11,8 +11,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @SpringBootApplication
-@MapperScan(basePackages = {"com.thinker.framework", "com.thinker.queue", "com.thinker.adminweb"})
-@ComponentScan(basePackages = {"com.thinker.framework", "com.thinker.queue", "com.thinker.adminweb"})
+@MapperScan(basePackages = {"com.thinker.framework", "com.thinker.queue", "com.thinker.adminweb", "com.thinker.minio"})
+@ComponentScan(basePackages = {"com.thinker.framework", "com.thinker.queue", "com.thinker.adminweb", "com.thinker.minio"})
 public class AdminWebApplication {
 
     public static void main(String[] args) {

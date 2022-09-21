@@ -178,8 +178,8 @@ public class DefineComponent {
                 String className = stackTraceElements[count].getClassName().toLowerCase();
                 String methodName = stackTraceElements[count].getMethodName().toLowerCase();
 
-                String[] classNames = StrUtil.split(className, ".");
-                parentCallName = (classNames[classNames.length-1] + "_" + methodName).replace("controller_", "_");
+                List<String> classNames = StrUtil.split(className, ".");
+                parentCallName = (classNames.get(classNames.size()-1) + "_" + methodName).replace("controller_", "_");
             }
 
             //清空队列

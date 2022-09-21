@@ -32,10 +32,10 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = Exception.class)
     public ThinkerResponse handleException(Exception e){
-        if(!e.getMessage().contains("Broken pipe")) {
+        if(e.getLocalizedMessage() == null || !(e.getLocalizedMessage().contains("Broken pipe") || e.getLocalizedMessage().contains("Connection reset by peer"))) {
             log.error("系统内部异常，异常信息", e);
         }
-        return new ThinkerResponse().local("message.thinker.exceptions.systemError").msg("系统内部异常:"+e.getMessage()).data(Dict.create().set("err", e.getMessage())).fail();
+        return new ThinkerResponse().local("message.thinker.exceptions.systemError").msg("系统内部异常:"+e.getLocalizedMessage()).data(Dict.create().set("err", e.getLocalizedMessage())).fail();
     }
 
     /**

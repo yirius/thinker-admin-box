@@ -8,6 +8,7 @@
         <module>admin-web</module>
         <module>admin-framework</module>
         <module>admin-queue</module>
+        <module>admin-minio</module>
     </modules>
 
     <parent>
@@ -35,7 +36,7 @@
         <mybatis.dynamic>3.5.1</mybatis.dynamic>
         <mybatis.p6spy>3.8.1</mybatis.p6spy>
         <fastjson>1.2.73</fastjson>
-        <hutool.all>5.6.3</hutool.all>
+        <hutool.all>5.8.5</hutool.all>
     </properties>
 
     <dependencies>
