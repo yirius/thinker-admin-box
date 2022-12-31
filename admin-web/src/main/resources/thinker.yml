@@ -31,8 +31,9 @@ thinker:
     # 不过滤的xss名称，否则<p>等会被过滤
     xssNames:
       - content
-    # 所有的资源路径，List<String>
+    # 所有的资源路径，Map<String, String>
     resourcePaths:
+      videoRecords: videoRecords/
     # 跨域地址设置, string
     allowedOrigins: "*"
     # 上传文件地址
