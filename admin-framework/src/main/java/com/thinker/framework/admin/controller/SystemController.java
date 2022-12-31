@@ -15,6 +15,7 @@ import com.thinker.framework.framework.factory.LoginFactory;
 import com.thinker.framework.framework.support.SpringContext;
 import com.thinker.framework.framework.widgets.ThinkerResponse;
 import com.thinker.framework.renders.DefineComponent;
+import com.thinker.framework.renders.assemblys.form.plugins.ElUpload;
 import com.thinker.framework.renders.assemblys.page.ElPopconfirm;
 import com.thinker.framework.renders.entity.enums.InputTypeEnum;
 import com.thinker.framework.renders.entity.table.CellRender;
@@ -63,7 +64,7 @@ public class SystemController extends ThinkerController {
     public ThinkerResponse rulesEdit() {
         return ThinkerAdmin.form(thinkerForm -> {
             DefineComponent.addRenderDataReady(
-                    "if(nextProp.viewBasePageRef) {" +
+                    "if(nextProp&&nextProp.viewBasePageRef&&nextProp.viewBasePageRef.value) {" +
                             "   var componentRender = nextProp.viewBasePageRef.value.findRender('component');" +
                             "   if(componentRender) { componentRender.attrs.disabled = nextProp.formValue.component == 'Layout'; }" +
                             "   var isLayoutRender = nextProp.viewBasePageRef.value.findRender('isLayout');" +
@@ -99,6 +100,10 @@ public class SystemController extends ThinkerController {
                 thinkerTabPane.openRow();
 
                 thinkerTabPane.input("icon", "图标选择").openRowCol().setSpan(24);
+
+                thinkerTabPane.upload("iconPic", "默认图标").setLimit(1).openRowCol().setSpan(12);
+                thinkerTabPane.upload("iconSelectedPic", "选中图标").setLimit(1).openRowCol().setSpan(12);
+
                 thinkerTabPane.input("weight", "权重(大数靠后)").setType(InputTypeEnum.NUMBER).openRowCol().setSpan(24);
 
                 thinkerTabPane.switchs("alwayShow", "持续侧边打开").openRowCol().setSpan(8).setXs(12);

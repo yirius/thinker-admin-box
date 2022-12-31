@@ -141,6 +141,12 @@ public class ElUpload extends FormPluginRender<ElUpload> {
                     "}";
         }
 
+        if(Validator.isEmpty(onChange)) {
+            this.onChange = "(file, files) => {" +
+                    "   props.modelRefsValue['"+getModelValue()+"'].value = files;" +
+                    "}";
+        }
+
         if(getChildren().size() == 0) {
             if(listType != null && listType.toString().equals("picture-card")) {
                 getChildren().add((new ThinkerTags()).runClosure(rootRender -> {

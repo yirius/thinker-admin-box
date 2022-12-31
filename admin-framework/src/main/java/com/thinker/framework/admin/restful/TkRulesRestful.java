@@ -2,6 +2,7 @@ package com.thinker.framework.admin.restful;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.lang.tree.TreeNode;
 import cn.hutool.core.lang.tree.TreeUtil;
 import com.alibaba.fastjson.JSON;
@@ -73,6 +74,8 @@ public class TkRulesRestful extends ThinkerRestful<TkRulesMapper, TkRules> {
         map.put("hideTab", entity.getHideTab() ? 1 : 0);
         map.put("hideMenu", entity.getHideMenu() ? 1 : 0);
         map.put("hideClose", entity.getHideClose() ? 1 : 0);
+        map.put("iconPic", Validator.isEmpty(entity.getIconPic()) ? new ArrayList<>() : JSON.parseArray(entity.getIconPic()));
+        map.put("iconSelectedPic", Validator.isEmpty(entity.getIconSelectedPic()) ? new ArrayList<>() : JSON.parseArray(entity.getIconSelectedPic()));
 
         return map;
     }

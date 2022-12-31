@@ -135,7 +135,7 @@ public class ThinkerForm extends FormRender {
                     "   for(var i in props.formValue) {" +
                     "       if(_AdminIs.isArray(props.formValue[i]) || _AdminIs.isObject(props.formValue[i])) {" +
                     "           saveData[i] = JSON.stringify(props.formValue[i]);" +
-                    "           if(_AdminIs.isArray(props.formValue[i]) && saveData[i].indexOf('blob:') > 0) {" +
+                    "           if(_AdminIs.isArray(props.formValue[i]) && saveData[i].indexOf('name') > 0 && (saveData[i].indexOf('url') > 0 || saveData[i].indexOf('response') > 0)) {" +
                     "               var arrSaveData = [];" +
                     "               props.formValue[i].forEach(item => {" +
                     "                   arrSaveData.push({name: item.name, url: item.response?item.response.data[i]:item.url});" +

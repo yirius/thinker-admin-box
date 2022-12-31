@@ -6,6 +6,7 @@ import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNode;
 import cn.hutool.core.lang.tree.TreeUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.thinker.framework.admin.entity.TkRules;
 import com.thinker.framework.admin.serviceimpl.TkRulesImpl;
 import com.thinker.framework.framework.ThinkerAdmin;
@@ -66,6 +67,26 @@ public class CacheUtil {
                         .query().orderByAsc("parent_id,weight").in("id", userRuleIds)
                         .eq("is_router", 1).list().stream().map(tkRules -> {
                             tkRules.setTitle("message.menu." + tkRules.getName());
+
+                            if(tkRules.getIconPic() != null && tkRules.getIconPic().equals("[]")) tkRules.setIconPic(null);
+                            if(Validator.isNotEmpty(tkRules.getIconPic())) {
+                                JSONArray jsonArray = JSON.parseArray(tkRules.getIconPic());
+                                if(jsonArray.size() > 0) {
+                                    tkRules.setIconPic(
+                                            jsonArray.getJSONObject(0).getString("url")
+                                    );
+                                }
+                            }
+
+                            if(tkRules.getIconSelectedPic() != null && tkRules.getIconSelectedPic().equals("[]")) tkRules.setIconSelectedPic(null);
+                            if(Validator.isNotEmpty(tkRules.getIconSelectedPic())) {
+                                JSONArray jsonArray = JSON.parseArray(tkRules.getIconSelectedPic());
+                                if(jsonArray.size() > 0) {
+                                    tkRules.setIconSelectedPic(
+                                            jsonArray.getJSONObject(0).getString("url")
+                                    );
+                                }
+                            }
 
                             Dict dict = Dict.create()
                                     .set("meta", JSON.parseObject(JSON.toJSONString(tkRules), MetaData.class))

@@ -3,12 +3,13 @@ package com.thinker.framework.framework.properties.thinker;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class ConfigProperties {
     private String loginUrl;
     private List<String> xssNames;
-    private List<String> resourcePaths;
+    private Map<String, String> resourcePaths;
     private String allowedOrigins;
     private String uploadPath;
     private List<String> uploadImageSuffix;

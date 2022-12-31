@@ -93,7 +93,7 @@ public class ThinkerTable extends RootRender {
     private Boolean stripe = true;
 
     @ToRenderAttrs
-    private Boolean border = true;
+    private Boolean border;
 
     @ToRenderAttrs
     private Boolean round;

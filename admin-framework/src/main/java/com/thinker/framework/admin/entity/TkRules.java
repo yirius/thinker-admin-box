@@ -48,6 +48,12 @@ public class TkRules extends ThinkerEntity {
     // 图标，也是菜单图标
     private String icon;
 
+    // 图标，也是菜单图标，可以选择手动上传
+    private String iconPic;
+
+    // 选中之后反白的图标
+    private String iconSelectedPic;
+
     // 是否缓存
     private Boolean cache;
 

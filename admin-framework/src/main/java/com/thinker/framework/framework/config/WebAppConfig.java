@@ -1,10 +1,14 @@
 package com.thinker.framework.framework.config;
 
+import cn.hutool.core.lang.Validator;
 import com.alibaba.fastjson.JSON;
 import com.thinker.framework.framework.ThinkerAdmin;
 import com.thinker.framework.framework.properties.ThinkerProperties;
+import com.thinker.framework.framework.support.SpringContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -21,6 +25,9 @@ import java.io.File;
 @Configuration
 public class WebAppConfig implements WebMvcConfigurer {
 
+    @Autowired
+    Environment environment;
+
     // 记录参数
     private final ThinkerProperties thinkerProperties;
     public WebAppConfig(ThinkerProperties thinkerProperties) {
@@ -34,8 +41,18 @@ public class WebAppConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:" + ThinkerAdmin.file().getDirPath(thinkerProperties.getConfig().getUploadPath()));
 
         // 注册剩余的指向
-        thinkerProperties.getConfig().getResourcePaths().forEach(s -> registry.addResourceHandler("/"+s+"**")
-                .addResourceLocations("file:" + ThinkerAdmin.file().getDirPath(s)));
+        thinkerProperties.getConfig().getResourcePaths().forEach((s, s1) -> {
+            String filePath = null;
+            if(s1.startsWith("$")) {
+                filePath = environment.getProperty(s1.replace("$", ""));
+            }
+            if(filePath == null || Validator.isEmpty(filePath)) {
+                filePath = ThinkerAdmin.file().getDirPath(s1);
+            }
+
+            registry.addResourceHandler("/"+s+"/**")
+                    .addResourceLocations("file:" + filePath);
+        });
 
         WebMvcConfigurer.super.addResourceHandlers(registry);
     }
