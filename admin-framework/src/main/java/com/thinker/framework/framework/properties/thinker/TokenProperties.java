@@ -25,6 +25,9 @@ public class TokenProperties {
     private String tokenKey;
     private String typeKey;
 
+    // 使用的规则id
+    private List<Integer> ruleIndex;
+
     /**
      * 获取到authtable
      * @param accessType

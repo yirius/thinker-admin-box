@@ -3,6 +3,7 @@ package com.thinker.framework.admin.restful;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.thinker.framework.admin.entity.TkMember;
@@ -113,8 +114,16 @@ public class TkMembersRestful extends ThinkerRestful<TkMemberMapper, TkMember> {
 
     @Override
     public void _afterSave(TkMember entity, boolean isUpdate) {
+        String redisSuffixName = "";
+        // 存在配置
+        if(ThinkerAdmin.properties().getToken().getRuleIndex() != null) {
+            // 0默认不读取，其他的读取
+            if(!(ThinkerAdmin.properties().getToken().getRuleIndex().size() == 1 && ThinkerAdmin.properties().getToken().getRuleIndex().get(0).equals(0))) {
+                redisSuffixName = "_" + StrUtil.join("_", ThinkerAdmin.properties().getToken().getRuleIndex());
+            }
+        }
         // 用户菜单可能变化，直接删除
-        ThinkerAdmin.redis().hashDel("ADMIN_ALL_USER_MENUS", entity.getId()+"_0");
+        ThinkerAdmin.redis().hashDel("ADMIN_ALL_USER_MENUS", entity.getId()+"_0"+redisSuffixName);
         // 用户角色可能变化，直接删除
         ThinkerAdmin.redis().hashDel("ADMIN_USER_ROLES", String.valueOf(entity.getId()));
         // 删除用户信息

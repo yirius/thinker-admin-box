@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileTypeUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSON;
+import com.thinker.framework.framework.ThinkerAdmin;
 import com.thinker.framework.framework.entity.vo.LabelValue;
 import com.thinker.framework.framework.support.SpringContext;
 import com.thinker.framework.framework.widgets.ThinkerResponse;
@@ -249,5 +250,10 @@ public class TestApi {
 
             thinkerPage.getChildren().add(thinkerForm);
         }).render();
+    }
+
+    @RequestMapping(value = "/testProperties")
+    public ThinkerResponse testProperties() {
+        return new ThinkerResponse().data(ThinkerAdmin.properties().getToken()).success();
     }
 }

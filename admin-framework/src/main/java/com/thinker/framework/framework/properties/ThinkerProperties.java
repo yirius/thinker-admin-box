@@ -16,7 +16,7 @@ import java.util.Map;
 @Data
 @Component
 @SpringBootConfiguration
-@PropertySource(value = {"classpath:thinker.yml"},factory = YamlConfigFactory.class)
+@PropertySource(value = {"classpath:thinker${thinker.profiles.active:}.yml"},factory = YamlConfigFactory.class)
 @ConfigurationProperties(prefix = "thinker")
 public class ThinkerProperties {
     private Map<String, String> sharding = new HashMap<>();
