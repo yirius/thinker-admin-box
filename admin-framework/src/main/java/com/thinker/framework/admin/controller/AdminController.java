@@ -48,7 +48,7 @@ public class AdminController {
         return ThinkerAdmin.version;
     }
 
-    private static final LineCaptcha lineCaptcha = CaptchaUtil.createLineCaptcha(80, 40, 4, 30);
+    public static final LineCaptcha lineCaptcha = CaptchaUtil.createLineCaptcha(80, 40, 4, 30);
     private static final RandomGenerator randomGenerator = new RandomGenerator("0123456789", 4);
 
     /**
