@@ -102,3 +102,9 @@ thinker:
         token:
         aesKey:
         msgDataFormat: JSON
+    offical:
+      - appid:
+        secret:
+        token:
+        aesKey:
+        msgDataFormat: JSON

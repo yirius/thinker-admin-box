@@ -14,6 +14,8 @@ import java.util.List;
 public class WechatProperties {
 
     private List<MinappConfig> minapp;
+    private List<MinappConfig> mpapp;
+    private List<MpPayConfig> payapp;
 
     @Data
     public static class MinappConfig {
@@ -41,5 +43,38 @@ public class WechatProperties {
          * 消息格式，XML或者JSON
          */
         private String msgDataFormat;
+    }
+
+
+    @Data
+    public static class MpPayConfig {
+        /**
+         * 设置微信小程序的appid
+         */
+        private String appid;
+        /**
+         * 设置微信支付商户号
+         */
+        private String mchId;
+        /**
+         * 设置微信支付V2秘钥
+         */
+        private String mchKey;
+        /**
+         * 设置微信支付V3秘钥
+         */
+        private String mchKeyPlus;
+        /**
+         * 设置微信支付V3秘钥
+         */
+        private String keyPath;
+        /**
+         * 设置微信支付V3秘钥
+         */
+        private String privateCertPath;
+        /**
+         * 设置微信支付V3秘钥
+         */
+        private String privateKeyPath;
     }
 }
