@@ -33,6 +33,8 @@ public class PageListService<T> extends BasePageServices<T> {
     private String sort = "id";
     private String order = "DESC";
 
+    // 新增一个sort自定义
+    private ParserSort<T> parserSort;
     private EachClosure<T> eachClosure;
     private ParserWrapper<T> parserWrapper;
     private List<WrapperValue> wrapperValues = new ArrayList<>();
@@ -45,6 +47,11 @@ public class PageListService<T> extends BasePageServices<T> {
     //使用闭包的形式
     public interface ParserWrapper<T> {
         void run(ThinkerWrapper<T> thinkerWrapper);
+    }
+
+    //使用闭包的形式
+    public interface ParserSort<T> {
+        void run(PageListService<T> pageListService);
     }
 
     public PageListService(ThinkerServiceImpl<?, T> service) {
@@ -94,11 +101,15 @@ public class PageListService<T> extends BasePageServices<T> {
 
         //判断是否加入了alias，加入了就需要设置
         if(Validator.isNotEmpty(this.sort)) {
-            String sortStr = (Validator.isNotEmpty(this.alias) ? this.alias+"." : "") + this.sort;
-            if(this.order.equalsIgnoreCase("ASC")) {
-                this.thinkerWrapper.orderByAsc(sortStr);
-            }else{
-                this.thinkerWrapper.orderByDesc(sortStr);
+            if (parserSort == null) {
+                String sortStr = (Validator.isNotEmpty(this.alias) ? this.alias+"." : "") + this.sort;
+                if(this.order.equalsIgnoreCase("ASC")) {
+                    this.thinkerWrapper.orderByAsc(sortStr);
+                }else{
+                    this.thinkerWrapper.orderByDesc(sortStr);
+                }
+            } else {
+                parserSort.run(this);
             }
         }
 

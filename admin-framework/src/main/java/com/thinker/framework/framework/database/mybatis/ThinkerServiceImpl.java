@@ -58,6 +58,7 @@ public class ThinkerServiceImpl<M extends ThinkerMapper<T>, T> extends ServiceIm
         // 需要最后重置一下查询数量
         thinkerWrapper.setPage(0);
         thinkerWrapper.select("count(*) as count");
+        thinkerWrapper.getExpression().getOrderBy().clear();
 
         List<Map<String, Object>> mapList = this.baseMapper.thinkersql(thinkerWrapper);
         if(mapList.size() > 1) {

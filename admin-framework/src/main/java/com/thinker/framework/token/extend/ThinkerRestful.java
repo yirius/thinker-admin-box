@@ -47,6 +47,7 @@ public class ThinkerRestful<M extends ThinkerMapper<T>, T> extends ThinkerContro
     private String useAlias = null;
     private String[] useWith = null;
     private String[] useField = null;
+    private PageListService.ParserSort<T> parserSort = null;
     private PageListService.EachClosure<T> eachClosure = null;
     private PageListService.ParserWrapper<T> parserWrapper = null;
 
@@ -56,6 +57,7 @@ public class ThinkerRestful<M extends ThinkerMapper<T>, T> extends ThinkerContro
 
         pageServiceResult.setAlias(useAlias).setWiths(useWith)
                 .setFields(useField).setEachClosure(eachClosure)
+                .setParserSort(parserSort)
                 .setWrapperValues(useWhere)
                 .setParserWrapper(parserWrapper);
 
