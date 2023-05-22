@@ -35,7 +35,7 @@ public class ThinkerPage {
     private String id = DefineComponent.getRenderId();
 
     // 默认的渲染方法
-    private RenderResult render = RenderResult.create("div", Dict.create().set("style", "padding: 10px;background-color: white;height: calc(100% - 20px);border-radius: 4px;").set("id", id));
+    private RenderResult render = RenderResult.create("div", Dict.create().set("style", "padding: 10px;background-color: var(--system-container-main-background);height: calc(100% - 20px);border-radius: 4px;").set("id", id));
 
     // 设置
     @Setter(AccessLevel.NONE)
