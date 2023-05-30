@@ -58,6 +58,12 @@ public class ThinkerPage {
             return rootRender.render();
         }).collect(Collectors.toList()));
 
+//        // 如果只有ElForm，说明是弹出
+//        if(render.getChildren().size() == 1 && render.getChildren().get(0).getComponent().equalsIgnoreCase("ElForm")) {
+//            render.getAttrs().set("style", render.getAttrs()
+//                    .getStr("style").replace("--system-container-main-background", "--system-container-background"));
+//        }
+
         return new ThinkerResponse().data(
                 Dict.create().set("modelValue", DefineComponent.getModelValue())
                         .set("formValue", DefineComponent.getFormValue())
