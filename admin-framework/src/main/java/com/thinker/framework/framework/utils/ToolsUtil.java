@@ -1,10 +1,19 @@
 package com.thinker.framework.framework.utils;
 
+import cn.hutool.captcha.CaptchaUtil;
+import cn.hutool.captcha.LineCaptcha;
+import cn.hutool.captcha.generator.RandomGenerator;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.text.StrBuilder;
 import com.alibaba.fastjson.JSON;
 import com.thinker.framework.framework.ThinkerAdmin;
+import com.thinker.framework.framework.support.exceptions.ThinkerException;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -108,5 +117,41 @@ public class ToolsUtil {
             }
         }
         return valueList;
+    }
+
+    /**
+     * 生成验证码
+     * @param httpServletRequest
+     * @param httpServletResponse
+     */
+    public static void captchaCreate(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        try {
+            LineCaptcha captcha = CaptchaUtil.createLineCaptcha(80, 40, 4, 30);
+            captcha.setGenerator(new RandomGenerator("0123456789", 4));
+            captcha.createCode();
+
+            captcha.createCode();
+            WebUtils.setSessionAttribute(httpServletRequest, "captcha", captcha);
+
+            //图形验证码写出，可以写出到文件，也可以写出到流
+            captcha.write(httpServletResponse.getOutputStream());
+        } catch (Exception err) {
+            throw new ThinkerException("验证码生成失败，请您点击右上角，刷新界面后重试");
+        }
+    }
+
+    /**
+     * 验证登录图片
+     * @param captchaCode
+     * @param httpServletRequest
+     * @return
+     */
+    public static boolean captchaVerify(String captchaCode, HttpServletRequest httpServletRequest) {
+        LineCaptcha lineCaptcha = (LineCaptcha) WebUtils.getSessionAttribute(httpServletRequest, "captcha");
+        if(lineCaptcha != null) {
+            return lineCaptcha.verify(captchaCode);
+        }
+
+        return false;
     }
 }

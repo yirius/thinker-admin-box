@@ -20,6 +20,7 @@ import com.thinker.framework.framework.service.UploadService;
 import com.thinker.framework.framework.support.SpringContext;
 import com.thinker.framework.framework.support.exceptions.ThinkerException;
 import com.thinker.framework.framework.utils.CacheUtil;
+import com.thinker.framework.framework.utils.ToolsUtil;
 import com.thinker.framework.framework.widgets.ThinkerResponse;
 import com.thinker.framework.token.aspect.CheckLoginAspect;
 import com.thinker.framework.token.factory.TokenFactory;
@@ -27,9 +28,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -47,9 +50,6 @@ public class AdminController {
     public String version() {
         return ThinkerAdmin.version;
     }
-
-    public static final LineCaptcha lineCaptcha = CaptchaUtil.createLineCaptcha(80, 40, 4, 30);
-    private static final RandomGenerator randomGenerator = new RandomGenerator("0123456789", 4);
 
     /**
      * 语言设置
@@ -93,13 +93,8 @@ public class AdminController {
      * @throws IOException
      */
     @RequestMapping(value = "/captcha")
-    public void captcha(HttpServletResponse httpServletResponse) throws IOException {
-        if(lineCaptcha.getGenerator() != randomGenerator) {
-            lineCaptcha.setGenerator(randomGenerator);
-        }
-        lineCaptcha.createCode();
-        //图形验证码写出，可以写出到文件，也可以写出到流
-        lineCaptcha.write(httpServletResponse.getOutputStream());
+    public void captcha(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        ToolsUtil.captchaCreate(httpServletRequest, httpServletResponse);
     }
 
     /**
@@ -110,7 +105,7 @@ public class AdminController {
      */
     @ThinkerTableLogAspect(value = "登录日志")
     @RequestMapping(value = "/login")
-    public ThinkerResponse login(String username, String password, String vercode) {
+    public ThinkerResponse login(String username, String password, String vercode, HttpServletRequest httpServletRequest) {
         // 如果密码错误次数过多，则显示验证码
         int loginErr = (int) ThinkerAdmin.redis().get("LOGIN_"+username+"_ERR", 0);
         if(loginErr == 1 && Validator.isEmpty(vercode)) {
@@ -118,7 +113,7 @@ public class AdminController {
         }
 
         // 如果提交了验证码，就验证
-        if(Validator.isNotEmpty(vercode) && !lineCaptcha.verify(vercode)) {
+        if(Validator.isNotEmpty(vercode) && !ToolsUtil.captchaVerify(vercode, httpServletRequest)) {
             return new ThinkerResponse().local("message.thinker.token.vercodeIncorrect").msg("验证码输入不正确").fail().code(506);
         }
 
