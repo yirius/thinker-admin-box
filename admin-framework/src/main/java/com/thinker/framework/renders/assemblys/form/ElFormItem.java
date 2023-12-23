@@ -137,6 +137,10 @@ public class ElFormItem extends RootRender {
         return addFormPlugin(new ElUpload(), field);
     }
 
+    public Tinymce tinymce(String field) {
+        return addFormPlugin(new Tinymce(), field);
+    }
+
     // 设置elCol分段
     private ElCol elCol;
 

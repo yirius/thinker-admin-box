@@ -98,4 +98,8 @@ public abstract class FormRender extends RootRender {
     public ElTree tree(String field, String label) {
         return addFormItem(field, label).tree(field);
     }
+
+    public Tinymce tinymce(String field, String label) {
+        return addFormItem(field, label).tinymce(field);
+    }
 }
