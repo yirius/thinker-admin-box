@@ -63,6 +63,8 @@ public class ThinkerServiceImpl<M extends ThinkerMapper<T>, T> extends ServiceIm
         List<Map<String, Object>> mapList = this.baseMapper.thinkersql(thinkerWrapper);
         if(mapList.size() > 1) {
             return (long) mapList.size();
+        } else if(mapList.size() == 0) {
+            return 0L;
         } else {
             return (Long) this.baseMapper.thinkersql(thinkerWrapper).get(0).get("count");
         }
