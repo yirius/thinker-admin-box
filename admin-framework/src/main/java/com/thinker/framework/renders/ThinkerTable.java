@@ -282,6 +282,9 @@ public class ThinkerTable extends RootRender {
     // 编辑文件的地址
     private String editUrl;
 
+    // 是否最终处理一下table
+    private RunClosure<ThinkerTable> runBeforeRender;
+
     public ThinkerTable setEditUrl(String editUrl) {
         this.editUrl = editUrl;
         formLayer = new LayerBox().addFormPage(getId()+"_formlayer", editUrl, 0);
@@ -491,6 +494,11 @@ public class ThinkerTable extends RootRender {
         // 补充一下几个props参数
         getAttrs().set("modelRefsValue", "[`eval`]props.modelRefsValue");
         getAttrs().set("useIdKey", "[`eval`]props.useIdKey");
+
+        // 如果的确存在需要运行，设置一下
+        if (runBeforeRender != null) {
+            runBeforeRender.run(this);
+        }
     }
 
     @Override
