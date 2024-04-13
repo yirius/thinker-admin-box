@@ -142,38 +142,42 @@ public class DatabaseUtil {
         for (int i = 0; i < entityConfigList.size(); i++) {
             if(!(!injectJoin && entityConfigList.get(i).isJoin())) {
                 if(withList.size() == 0 || withList.contains(entityConfigList.get(i).getFieldName())) {
-                    // 先组装一下查询的sql
-                    String whereSql = entityConfigList.get(i).getLazyConditionStr(map);
-                    String md5 = SecureUtil.md5(
-                            entityConfigList.get(i).getField() + entityConfigList.get(i).getTableName() + whereSql
-                    );
-
-                    // 在当前线程里，只判断一次即可
-                    Object result = ThinkerAdmin.thread().getObject("WITH_" + md5);
-                    if(result == null) {
-                        // 全都渲染，或渲染指定的
-                        thinkerQueryParam.setSql(
-                                "select " + entityConfigList.get(i).getField() + " from " + entityConfigList.get(i).getTableName() +
-                                        " where " + whereSql
+                    try {
+                        // 先组装一下查询的sql
+                        String whereSql = entityConfigList.get(i).getLazyConditionStr(map);
+                        String md5 = SecureUtil.md5(
+                                entityConfigList.get(i).getField() + entityConfigList.get(i).getTableName() + whereSql
                         );
-                        result = thinkerMapper.thinkerquery(thinkerQueryParam);
-                        ThinkerAdmin.thread().setObject("WITH_" + md5, result);
-                    }
 
-                    if(entityObj.getClass().getSimpleName().equals("Map")) {
-                        if(entityConfigList.get(i).getType() == 1) {
-                            ((Map) entityObj).put(entityConfigList.get(i).getFieldName(), ((List) result).size()==0 ? null : ((List) result).get(0));
-                        } else if(entityConfigList.get(i).getType() == 2) {
-                            ((Map) entityObj).put(entityConfigList.get(i).getFieldName(), result);
+                        // 在当前线程里，只判断一次即可
+                        Object result = ThinkerAdmin.thread().getObject("WITH_" + md5);
+                        if(result == null) {
+                            // 全都渲染，或渲染指定的
+                            thinkerQueryParam.setSql(
+                                    "select " + entityConfigList.get(i).getField() + " from " + entityConfigList.get(i).getTableName() +
+                                            " where " + whereSql
+                            );
+                            result = thinkerMapper.thinkerquery(thinkerQueryParam);
+                            ThinkerAdmin.thread().setObject("WITH_" + md5, result);
                         }
-                    } else {
-                        if(entityConfigList.get(i).getType() == 1) {
-                            List<?> list = JSON.parseArray(JSON.toJSONString(result), entityConfigList.get(i).getFieldIns().getType());
-                            BeanUtil.setFieldValue(entityObj, entityConfigList.get(i).getFieldName(), list.size()==0 ? null : list.get(0));
-                        } else if(entityConfigList.get(i).getType() == 2) {
-                            Class<?> fieldType = (Class<?>) ((ParameterizedType) entityConfigList.get(i).getFieldIns().getGenericType()).getActualTypeArguments()[0];
-                            BeanUtil.setFieldValue(entityObj, entityConfigList.get(i).getFieldName(), JSON.parseArray(JSON.toJSONString(result), fieldType));
+
+                        if(entityObj.getClass().getSimpleName().equals("Map")) {
+                            if(entityConfigList.get(i).getType() == 1) {
+                                ((Map) entityObj).put(entityConfigList.get(i).getFieldName(), ((List) result).size()==0 ? null : ((List) result).get(0));
+                            } else if(entityConfigList.get(i).getType() == 2) {
+                                ((Map) entityObj).put(entityConfigList.get(i).getFieldName(), result);
+                            }
+                        } else {
+                            if(entityConfigList.get(i).getType() == 1) {
+                                List<?> list = JSON.parseArray(JSON.toJSONString(result), entityConfigList.get(i).getFieldIns().getType());
+                                BeanUtil.setFieldValue(entityObj, entityConfigList.get(i).getFieldName(), list.size()==0 ? null : list.get(0));
+                            } else if(entityConfigList.get(i).getType() == 2) {
+                                Class<?> fieldType = (Class<?>) ((ParameterizedType) entityConfigList.get(i).getFieldIns().getGenericType()).getActualTypeArguments()[0];
+                                BeanUtil.setFieldValue(entityObj, entityConfigList.get(i).getFieldName(), JSON.parseArray(JSON.toJSONString(result), fieldType));
+                            }
                         }
+                    } catch (Exception err) {
+                        log.error(err.getMessage());
                     }
                 }
             }
