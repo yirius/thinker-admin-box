@@ -102,25 +102,26 @@ public class EntityConfig {
      */
     public String getLazyConditionStr(Map<String, Object> originData) throws LazyWithFillException {
         StrBuilder strBuilder = new StrBuilder();
-        for (int i = 0; i < condition.size(); i++) {
-            if(condition.get(i).contains("this.")) {
-                String oriField = condition.get(i).replace("this.", "");
-                if(originData.containsKey(oriField)) {
+        for (String s : condition) {
+            if (s.contains("this.")) {
+                String oriField = s.replace("this.", "");
+                if (originData.containsKey(oriField)) {
                     strBuilder.append(originData.get(oriField));
                 } else {
-                    throw new LazyWithFillException(
-                            "message.thinker.exceptions.fillNoField",
-                            "数据中不存在参数"+oriField+",无法进行填充", 440, Dict.create().set("field", oriField)
-                    );
+                    return null;
+//                    throw new LazyWithFillException(
+//                            "message.thinker.exceptions.fillNoField",
+//                            "数据中不存在参数"+oriField+",无法进行填充", 440, Dict.create().set("field", oriField)
+//                    );
                 }
             } else {
                 strBuilder.append(
-                        condition.get(i)
-                        .replace("that.", "")
-                        .replace("eq", " = ")
-                        .replace("ne", " <> ")
-                        .replace("lt", " < ")
-                        .replace("gt", " > ")
+                        s
+                                .replace("that.", "")
+                                .replace("eq", " = ")
+                                .replace("ne", " <> ")
+                                .replace("lt", " < ")
+                                .replace("gt", " > ")
                 );
             }
         }

@@ -381,7 +381,7 @@ public class ThinkerTable extends RootRender {
                     new EditRender().setName("$buttons").setChildren(new ArrayList<Dict>() {
                         {
                             add(Dict.create().set("props", Dict.create().set("type", "submit").set("content", "提交").set("status", "primary")));
-                            add(Dict.create().set("props", Dict.create().set("type", "reset").set("content", "重置")));
+//                            add(Dict.create().set("props", Dict.create().set("type", "reset").set("content", "重置")));
                         }
                     })
             ));

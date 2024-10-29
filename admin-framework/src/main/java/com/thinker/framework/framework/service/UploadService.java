@@ -18,10 +18,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -137,7 +134,7 @@ public class UploadService {
         String fileMd5;
         String fileSuffix;
         try{
-            fileMd5 = ThinkerAdmin.encrypt().md5(Arrays.toString(multipartFile.getBytes()));
+            fileMd5 = ThinkerAdmin.encrypt().md5(multipartFile.getInputStream());
 
             fileSuffix = FileTypeUtil.getType(multipartFile.getInputStream(), multipartFile.getOriginalFilename());
             String originalExt = FileUtil.extName(multipartFile.getOriginalFilename());

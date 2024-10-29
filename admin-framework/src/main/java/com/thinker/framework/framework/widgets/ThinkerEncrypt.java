@@ -12,6 +12,8 @@ import cn.hutool.crypto.asymmetric.SignAlgorithm;
 import cn.hutool.crypto.symmetric.DESede;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.util.HashMap;
@@ -51,6 +53,10 @@ public class ThinkerEncrypt {
      **/
     public String md5(String string){
         return SecureUtil.md5(string).toUpperCase();
+    }
+
+    public String md5(InputStream inputStream){
+        return SecureUtil.md5(inputStream).toUpperCase();
     }
 
     /**
